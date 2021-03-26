@@ -59,15 +59,11 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, char[] item_
 
     if(Check_IsValidFunctionCallBack(func, plugin))
     {
-        int item_id;
-        map.GetValue("item_id", item_id);
-
         Call_StartFunction(plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_unique);
         Call_PushCell(Convert_PluginId(plugin_unique));
         Call_PushString(item_unique);
-        Call_PushCell(item_id);
         Call_PushCell(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
         Call_PushCell(maxlen);
@@ -92,15 +88,11 @@ void CallBack_OnItemPreview(int client, const char[] plugin_unique, const char[]
 
     if(Check_IsValidFunctionCallBack(func, plugin))
     {
-        int item_id;
-        map.GetValue("item_id", item_id);
-
         Call_StartFunction(plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_unique);
         Call_PushCell(Convert_PluginId(plugin_unique));
         Call_PushString(item_unique);
-        Call_PushCell(item_id);
         Call_PushCell(core_type);
         Call_Finish();
     }

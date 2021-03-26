@@ -24,11 +24,6 @@ enum PluginId
     INVALID_PLUGIN_ID = -1,
 }
 
-enum ItemId
-{
-    INVALID_ITEM_ID = -1,
-}
-
 typeset MC_OnMenuDisplayCallback
 {
     /** 
@@ -51,15 +46,14 @@ typeset MC_OnMenuDisplayCallback
     *	@param client           Индекс игрока
     *	@param plugin_unique    Идентификатор плагина
     *	@param plugin_id        Индекс плагина
-    *	@param item             Идентификатор предмета
-    *	@param item_id          Индекс предмета
+    *	@param item_unique      Идентификатор предмета
     *   @param core_type        Тип ядра
     *	@param buffer           Буфер, куда будет помещён результат           
     *	@param maxlen           Размер буфера           
     *	
     *	@return true - что бы отобразить новое название или не менять его, false - что бы скрыть
     */
-	function bool (int client, const char[] plugin_unique, PluginId plugin_id, const char[] item, ItemId item_id, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_unique, PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 }
 
 /**
@@ -68,13 +62,12 @@ typeset MC_OnMenuDisplayCallback
 *	@param client           Индекс игрока
 *	@param plugin_unique    Идентификатор плагина
 *	@param plugin_id        Индекс плагина
-*	@param item             Идентификатор предмета
-*	@param item_id          Индекс предмета
+*	@param item_unique      Идентификатор предмета
 *   @param core_type        Тип ядра
 *	
 *	@noreturn
 */
-typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_unique, PluginId plugin_id, const char[] item, ItemId item_id, MC_CoreTypeBits core_type);
+typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_unique, PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type);
 
 /*
  * Вызывается после загрузки ядра.
@@ -124,19 +117,18 @@ native KeyValues MC_GetSettingsConfigKV(MC_CoreTypeBits core_type);
  * @param OnDisplay         Обратный вызов отображения в меню. Название Vip функции.
  * @param dont_load         Bits индексов ядер, в которые не регистрировать данный идентификатор плагина 
  *	-
- * @return      Индекс плагина 
+ * @noreturn   
 */
-native PluginId MC_RegisterPlugin(char[] plugin_unique, MC_OnMenuDisplayCallback OnDisplay, MC_CoreTypeBits dont_load = Core_Unloaded);
+native void MC_RegisterPlugin(char[] plugin_unique, MC_OnMenuDisplayCallback OnDisplay, MC_CoreTypeBits dont_load = Core_Unloaded);
  
 /*
  * Начать регистрацию предмета
  *	-
- * @param plugin_id         Индекс плагина
- * @param item              Уникальное имя предмета
+ * @param item_unique       Уникальное имя предмета
  *	-
  * @return      true if all is well, false otherwise 
 */
-native bool MC_StartItem(PluginId plugin_id, char[] item);
+native bool MC_StartItem(char[] item_unique);
 
 /*
  * Добавить обратные вызова предмета
@@ -154,18 +146,18 @@ native void MC_SetItemCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUN
  *	-
  * @noparams
  *	-
- * @return      Индекс предмета
+ * @noreturn   
 */
-native ItemId MC_EndItem();
+native void MC_EndItem();
  
 /*
  * Закончить регистрацию плагина
  *	-
- * @param plugin_id         Индекс плагина
+ * @noparams
  *	-
- * @noreturn
+ * @return      Индекс плагина 
 */
-native void MC_EndPlugin(PluginId plugin_id);
+native PluginId MC_EndPlugin();
  
 /*
  * Выгрузить данные плагина (полностью). Обязательно должен вызываться в OnPluginEnd()
@@ -194,11 +186,11 @@ native bool MC_GetClientActiveItem(int client, PluginId plugin_id, char[] buffer
  * @param client            Индекс игрока
  * @param plugin_id         Индекс плагина
  * @param core_type         Тип ядра
- * @param item              Уникальное имя предмета, которое и поставится активным
+ * @param item_unique       Уникальное имя предмета (установится активным)
  *	-
  * @return      true if all is well, false otherwise 
 */
-native bool MC_SetClientActiveItem(int client, PluginId plugin_id, MC_CoreTypeBits core_type, char[] item);
+native bool MC_SetClientActiveItem(int client, PluginId plugin_id, MC_CoreTypeBits core_type, char[] item_unique);
  
 /*
  * Получить конфиг модуля из папки 'addons/sourcemod/configs/multi-core/modules/'

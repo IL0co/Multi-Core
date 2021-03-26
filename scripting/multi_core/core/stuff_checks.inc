@@ -16,7 +16,7 @@ bool Check_IsValidItemUnique(char[] plugin_unique, char[] item)
 	return false;
 }
 
-bool Check_IsItemRegisteredStartedOnPlugin(Handle plugin, char[] buffer = "", int maxlen = 0)
+bool Check_IsRegisteredStartedOnPlugin(Handle plugin, char[] buffer = "", int maxlen = 0)
 {
 	char buff[32];
 	Format(buff, sizeof(buff), "%i", plugin);

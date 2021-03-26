@@ -15,7 +15,7 @@ void Unload_InCores(char[] plugin_unique)
 }
 
 void Load_InCores(char[] plugin_unique)
-{
+{	// TODO: сделать проверку, есть ли зарегистрированные категории
 	Load_Vip(plugin_unique);
 	Load_Shop(plugin_unique);
 }
@@ -166,4 +166,17 @@ int Get_PluginPriorityArrayList(const char[] plugin_unique = "", int plugin_id =
 	}
 
 	return g_mapPriorities.GetValue(plugin_unique, ar);
+}
+
+bool Jump_ToPluginHandle(Handle plugin, StringMap &map = null)
+{
+	char buff[32];
+	Format(buff, sizeof(buff), "%i", plugin);
+	
+	g_kvNowRegisteredItems.Rewind();
+	
+	if((map = view_as<StringMap>(g_kvNowRegisteredItems.GetNum(buff))) != null)
+		return true;
+
+	return false;
 }
