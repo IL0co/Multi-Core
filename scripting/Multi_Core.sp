@@ -16,7 +16,7 @@ public Plugin myinfo =
 	name		= "[MC] Multi-Core",
 	author	  	= "iLoco",
 	description = "Ядро, контролирующее регистрацию предметов в других ядрах",
-	version	 	= "0.1.1",
+	version	 	= "0.1.2",
 	url			= "http://hlmod.ru"
 };
 
@@ -32,7 +32,6 @@ public Plugin myinfo =
 
 	FIXME:
 		- убрать с требований при регистрации предмета аргумент с plugin_id, она автоматически будет
-		- убрать plugin из предметов
 */
 
 #include "multi_core/core/globals.inc"
