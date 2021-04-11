@@ -45,12 +45,9 @@ void Error_Native_FinishRegisterThePreviousItem(char[] unique)
 	ThrowNativeError(SP_ERROR_PARAM, "Finish registering the previous item '%s'!", unique);
 }
 
-void Error_Native_FinishRegisterThePreviousPluginUnique()
+void Error_Native_FinishRegisterThePreviousPluginUnique(MC_PluginId enum_plugin)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	g_kvNowRegisteredItems.GetString("plugin_unique", plugin_unique, sizeof(plugin_unique));
-
-	ThrowNativeError(SP_ERROR_PARAM, "Finish registering the previous Plugin_Unique '%s'!", plugin_unique);
+	ThrowNativeError(SP_ERROR_PARAM, "Finish registering the previous Plugin_Unique '%s'!", enum_plugin.Unique);
 }
 
 // void Error_Native_FileIsNotExist(char[] path)

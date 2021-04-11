@@ -132,7 +132,7 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 	if(strcmp(buff, "all", false) == 0)
 	{
 		ArrayList ar;
-		plugin_map.GetValue("items array", ar);
+		plugin_map.GetValue("items_array", ar);
 
 		char item[MAX_UNIQUE_LENGTH];
 

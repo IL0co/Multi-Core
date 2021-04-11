@@ -118,14 +118,14 @@ int Convert_PluginId(const char[] plugin_unique = "", int plugin_id = -1, char[]
 {
 	if(plugin_id >= 0)
 	{
-		return g_arPluginUniques.FindString(plugin_unique);
-	}
-	else if(plugin_unique[0])
-	{
 		g_arPluginUniques.GetString(plugin_id, buffer, maxlen);
 
 		if(buffer[0])
 			return 1;
+	}
+	else if(plugin_unique[0])
+	{
+		return g_arPluginUniques.FindString(plugin_unique);
 	}
 	
 	return -1;
@@ -168,14 +168,12 @@ int Get_PluginPriorityArrayList(const char[] plugin_unique = "", int plugin_id =
 	return g_mapPriorities.GetValue(plugin_unique, ar);
 }
 
-bool Jump_ToPluginHandle(Handle plugin, StringMap &map = null)
+bool Get_NowRegisterPluginId(Handle plugin, MC_PluginId enum_plugin = 0)
 {
 	char buff[32];
 	Format(buff, sizeof(buff), "%i", plugin);
 	
-	g_kvNowRegisteredItems.Rewind();
-	
-	if((map = view_as<StringMap>(g_kvNowRegisteredItems.GetNum(buff))) != null)
+	if(g_mapNowRegisteredItems.GetArray(buff, enum_plugin, sizeof(enum_plugin)))
 		return true;
 
 	return false;

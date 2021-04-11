@@ -20,6 +20,7 @@ public Plugin myinfo =
 	url			= "http://hlmod.ru"
 };
 
+
 /*	TODO:
 	- перейти с Cookie системы бд на SQL
 	- сделать рефакторинг кода
@@ -31,7 +32,9 @@ public Plugin myinfo =
 	- добавить форвард на регистрацию предмета в каком-то ядре (в процессе регистрации, что бы можно было дополнить своим)
 
 	FIXME:
-		- убрать с требований при регистрации предмета аргумент с plugin_id, она автоматически будет
+	- добавить файл перевода
+	- добавить описание предмета и "категории"
+	- Добавить CB на нажатие в каком-то меню этого предмета.
 */
 
 #include "multi_core/core/globals.inc"
@@ -154,7 +157,7 @@ public void OnPluginStart()
 	delete kv;
 
 	Check_AllLibraries();
-	CreateTimer(0.1, Timer_Delay);
+	CreateTimer(0.1, Timer_Delay_StartCore);
 
 	RegAdminCmd("sm_mc_dump", Command_Dump, ADMFLAG_ROOT);
 }
@@ -163,6 +166,7 @@ public Action Command_Dump(int client, int args)
 {
 	KeyValues kv = new KeyValues("MC Dump");
 
+	MC_PluginId enum_plugin, enum_item;
 	ArrayList ar;
 	StringMap plugin_map, item_map;
 	char plugin_unique[MAX_UNIQUE_LENGTH], item[MAX_UNIQUE_LENGTH];
@@ -176,38 +180,23 @@ public Action Command_Dump(int client, int args)
 
 		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
 		
-		if(!g_mapPluginUniques.GetValue(plugin_unique, plugin_map))
+		if(!g_mapPluginUniques.GetArray(plugin_unique, enum_plugin, sizeof(enum_plugin)))
 			continue;
 
 		kv.JumpToKey(plugin_unique, true);
 
-		plugin_map.GetValue("plugin", plugin);
-		kv.SetNum("plugin", view_as<int>(plugin));
+		kv.SetNum("plugin", view_as<int>(enum_plugin.Plugin));
+		kv.SetNum("items_array", view_as<int>(enum_plugin.ArItems));
+		kv.SetNum("cookie", view_as<int>(enum_plugin.Cookie));
 
-		plugin_map.GetValue("items array", ar);
-		kv.SetNum("items array", view_as<int>(ar));
-
-		plugin_map.GetValue("cookie", cookie);
-		kv.SetNum("cookie", view_as<int>(cookie));
-
-		plugin_map.GetValue("callbacks", data);
-		kv.SetNum("callbacks", view_as<int>(data));
-
-		for(int item_index; item_index < ar.Length; item_index++)
+		for(int item_index; item_index < enum_plugin.ArItems; item_index++)
 		{
-			ar.GetString(item_index, item, sizeof(item));
+			enum_plugin.ArItems.GetString(item_index, item, sizeof(item));
 
-			if(!plugin_map.GetValue(item, item_map))
-				continue;
+			// if(!enum_plugin.Item("item", enum_item))
+			// 	continue;
 
-			kv.JumpToKey(item, true);
-
-			item_map.GetValue("plugin", plugin);
-			kv.SetNum("plugin", view_as<int>(plugin));
-
-			item_map.GetValue("callbacks", data);
-			kv.SetNum("callbacks", view_as<int>(data));
-
+			kv.SetNum(item, true);
 			kv.GoBack();
 		}
 	}
@@ -220,7 +209,7 @@ public Action Command_Dump(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Timer_Delay(Handle timer)
+public Action Timer_Delay_StartCore(Handle timer)
 {
 	CallForward_OnCoreChangeStatus("multicore", Core_MultiCore, true);
 }

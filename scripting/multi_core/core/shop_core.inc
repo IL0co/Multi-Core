@@ -13,6 +13,9 @@ public void Shop_Started()
 
 public void Load_Shop(char[] plugin_unique)
 {
+	if(!Check_IsCoreLoaded(Core_Shop))
+		return;
+		
 	if(!Check_IsAllowRegisterInCore(plugin_unique, Core_Shop))
 		return;
 
@@ -23,7 +26,7 @@ public void Load_Shop(char[] plugin_unique)
 	int pos;
 
 	Get_PluginMap(plugin_unique, _, category_map);
-	category_map.GetValue("items array", ar);
+	category_map.GetValue("items_array", ar);
 
 	ar = ar.Clone();
 
@@ -52,6 +55,7 @@ public void Load_Shop(char[] plugin_unique)
 					if(strcmp(category_unique, plugin_unique, false) != 0)
 					{
 						g_kvItemsToShop.GetString("In Category", in_category, sizeof(in_category));
+						
 						if(!in_category[0] || strcmp(in_category, plugin_unique, false) != 0)
 						{
 							continue;

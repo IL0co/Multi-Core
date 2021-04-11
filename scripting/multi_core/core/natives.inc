@@ -3,7 +3,7 @@
 public void LoadNatives()
 {
 	g_arPluginUniques = new ArrayList(64);
-	g_kvNowRegisteredItems = new KeyValues("Now Registered Items");
+	g_mapNowRegisteredItems = new StringMap();
 	g_mapPluginUniques = new StringMap();
 
 	CreateNative("MC_PrecacheFile", Native_MC_PrecacheFile);
@@ -21,224 +21,157 @@ public void LoadNatives()
 	CreateNative("MC_SetClientActiveItem", Native_MC_SetClientActiveItem);
 }
 
-public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? добавить таймер на удаление регистрации, что бы закрыть DataPack 
+public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? добавить таймер на удаление регистрации, что бы закрыть хендлы 
 {
-	if(Jump_ToPluginHandle(plugin))
-		Error_Native_FinishRegisterThePreviousPluginUnique();
+	MC_PluginId enum_plugin;
 
-	char plugin_unique[MAX_UNIQUE_LENGTH];
+	if(Get_NowRegisterPluginId(plugin, enum_plugin))
+		Error_Native_FinishRegisterThePreviousPluginUnique(enum_plugin);
 
-	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
+	GetNativeString(1, enum_plugin.Unique, sizeof(enum_plugin.Unique));
 
-	if(g_arPluginUniques.FindString(plugin_unique))
-		Error_Native_PluginUniqueIsAlreadyRegistered(plugin_unique);
+	if(g_arPluginUniques.FindString(enum_plugin.Unique) != -1)
+		Error_Native_PluginUniqueIsAlreadyRegistered(enum_plugin.Unique);
 	
+	enum_plugin.Plugin = plugin;
+
 	char buff[96];
-	StringMap map = new StringMap();
-
-	map.SetValue("plugin", plugin);
-
 	Format(buff, sizeof(buff), "%i", plugin);
-	g_kvNowRegisteredItems.SetNum(buff, view_as<int>(map));
+	g_mapNowRegisteredItems.SetArray(buff, enum_plugin, sizeof(enum_plugin));
 
-	map.SetString("plugin_unique", plugin_unique);
+	Format(buff, sizeof(buff), "MultiCore_%s", enum_plugin.Unique);
+	enum_plugin.Cookie = new Cookie(buff, buff, CookieAccess_Private);
 
-	Format(buff, sizeof(buff), "MultiCore_%s", plugin_unique);
-	map.SetValue("cookie", new Cookie(buff, buff, CookieAccess_Private));
-
-	DataPack data = new DataPack();
-	data.WriteFunction(GetNativeFunction(2));
-	map.SetValue("callbacks", data);
-
-	map.SetValue("items_array", new ArrayList(MAX_UNIQUE_LENGTH));
-	map.SetValue("items_map", new StringMap());
-
-	map.SetValue("dontLoadCoreBits", GetNativeCell(3));
+	enum_plugin.CB_OnDisplay = GetNativeFunction(2);
+	enum_plugin.ArItems = new ArrayList(MAX_UNIQUE_LENGTH);
+	enum_plugin.MapItems = new StringMap();
+	enum_plugin.IgnoreCoresBits = GetNativeCell(3);
 }
 
 public int Native_MC_StartItem(Handle plugin, int numParams)
 {
-	char item[MAX_UNIQUE_LENGTH];
-	StringMap plugin_map;
+	MC_PluginId enum_plugin;
 
+	if(Get_NowRegisterPluginId(plugin, enum_plugin))
+		Error_Native_FinishRegisterThePreviousPluginUnique(enum_plugin);
+
+	char item[MAX_UNIQUE_LENGTH];
 	GetNativeString(1, item, sizeof(item));
 
-	if(!Jump_ToPluginHandle(plugin, plugin_map))
-		Error_Native_CategoryIsNoRegisteredBefore(item);
-
-	StringMap item_map;
-
-	if(plugin_map.GetValue("registered_item", item_map))
+	if(enum_plugin.IsRegisteredNowItem)
 	{
-		item_map.GetString("item_unique", item, sizeof(item));
+		enum_plugin.ArItems.GetString(enum_plugin.ArItems.Length-1, item, sizeof(item));
 		Error_Native_FinishRegisterThePreviousItem(item);
 	}
 
-	ArrayList ar;
-
-	plugin_map.GetValue("items_array", ar);
-
-	if(ar.FindString(item) != -1)
+	if(enum_plugin.ArItems.FindString(item) != -1)
 	{
-		char plugin_unique[MAX_UNIQUE_LENGTH];
-		plugin_map.GetString("plugin_unique", plugin_unique, sizeof(plugin_unique));
-		
-		Error_Native_ItemIsAlreadyRegistered(item, plugin_unique);
+		Error_Native_ItemIsAlreadyRegistered(item, enum_plugin.Unique);
 	}
 
-	item_map = new StringMap();
-	plugin_map.SetValue("registered_item", item_map);
-	item_map.SetString("item_unique", item);
+	MC_Item enum_item;
+	enum_item.Unique = item;
 
+	enum_plugin.MapItems.SetArray(item, enum_item, sizeof(enum_item));
+	enum_plugin.ArItems.PushString(item);
+
+	enum_plugin.IsRegisteredNowItem = true;
 	return true;
 }
 
 public int Native_MC_EndItem(Handle plugin, int numParams)
 {
-	StringMap plugin_map;
+	MC_PluginId enum_plugin;
 
-	if(!Jump_ToPluginHandle(plugin, plugin_map))
+	if(!Get_NowRegisterPluginId(plugin, enum_plugin))
+		Error_Native_NoPluginUniqueBeingRegistered();
+
+	MC_Item enum_item;
+
+	if(!enum_plugin.LastItem(enum_item))
 	{
 		Error_Native_NoItemUniqueBeingRegistered();
 	}
 
-	StringMap item_map;
-
-	if(!plugin_map.GetValue("registered_item", item_map))
-	{
-		Error_Native_NoItemUniqueBeingRegistered();
-	}
-
-	char item_unique[MAX_UNIQUE_LENGTH];
-	item_map.GetString("item_unique", item_unique, sizeof(item_unique));
-	item_map.Remove("item_unique");
-
-	ArrayList items_array;
-	plugin_map.GetValue("items_array", items_array);
-	items_array.PushString(item_unique);
-
-	StringMap plugin_items_map;
-	plugin_map.GetValue("items_array", plugin_items_map);
-	plugin_items_map.SetValue(item_unique, item_map);
-
-	plugin_map.Remove("registered_item");
+	enum_plugin.IsRegisteredNowItem = false;
 }
 
 public int Native_MC_EndPlugin(Handle plugin, int numParams)
 {
-	StringMap plugin_map;
+	MC_PluginId enum_plugin;
 
-	if(!Jump_ToPluginHandle(plugin, plugin_map))
-	{
+	if(!Get_NowRegisterPluginId(plugin, enum_plugin))
 		Error_Native_NoPluginUniqueBeingRegistered();
+
+	if(enum_plugin.IsRegisteredNowItem == true)
+	{
+		MC_Item enum_item;
+		enum_plugin.LastItem(enum_item);
+
+		Error_Native_FinishRegisterThePreviousItem(enum_item.Unique);
 	}
 
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	plugin_map.GetString("plugin_unique", plugin_unique, sizeof(plugin_unique));
-	plugin_map.Remove("plugin_unique");
-
-	int index = g_arPluginUniques.PushString(plugin_unique);
-	g_mapPluginUniques.SetValue(plugin_unique, plugin_map);
-
-	g_kvNowRegisteredItems.DeleteThis();
-	g_kvNowRegisteredItems.Rewind();
-
-	Load_InCores(plugin_unique);
+	int index = g_arPluginUniques.PushString(enum_plugin.Unique);
+	g_mapPluginUniques.SetArray(enum_plugin.Unique, enum_plugin, sizeof(enum_plugin));
+	
+	Load_InCores(enum_plugin.Unique);
+	g_mapNowRegisteredItems.Remove(enum_plugin.Unique);
 	
 	return index;
 }
 
 public int Native_MC_SetItemCallBacks(Handle plugin, int numParams)
 {
-	StringMap plugin_map;
+	MC_PluginId enum_plugin;
 
-	if(!Jump_ToPluginHandle(plugin, plugin_map))
+	if(!Get_NowRegisterPluginId(plugin, enum_plugin))
 	{
 		Error_Native_NoPluginUniqueBeingRegistered();
 	}
 
-	StringMap item_map;
+	MC_Item enum_item;
 
-	if(!plugin_map.GetValue("registered_item", item_map))
+	if(!enum_plugin.LastItem(enum_item))
 	{
 		Error_Native_NoItemUniqueBeingRegistered();
 	}
 
-	DataPack data;
-	
-	if(item_map.GetValue("callbacks", data))
-	{
-		char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-		plugin_map.GetString("plugin_unique", plugin_unique, sizeof(plugin_unique));
-		item_map.GetString("item_unique", item_unique, sizeof(item_unique));
-
-		Error_Native_CallBacksInItemIsAlreadyRegistered(item_unique, plugin_unique);
-	}
-
-	data = new DataPack();
-	data.WriteFunction(GetNativeFunction(1));
-	data.WriteFunction(GetNativeFunction(2));
-	
-	item_map.SetValue("callbacks", data);
+	enum_item.CB_OnDisplay = GetNativeFunction(1);
+	enum_item.CB_OnPreview = GetNativeFunction(2);
 }
 
 public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 {
-	ArrayList ar;
-	StringMap plugin_map, item_map;
-	char plugin_unique[MAX_UNIQUE_LENGTH], item[MAX_UNIQUE_LENGTH];
-	Handle plugin_owner;
-	DataPack data;
-	Cookie cookie;
+	MC_PluginId enum_plugin;
+	char plugin_unique[MAX_UNIQUE_LENGTH];
 
 	for(int index; index < g_arPluginUniques.Length; index++)
 	{
 		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
-		
-		if(!g_mapPluginUniques.GetValue(plugin_unique, plugin_map))
+		g_mapPluginUniques.GetArray(plugin_unique, enum_plugin, sizeof(enum_plugin));
+
+		if(enum_plugin.Plugin != plugin)
 			continue;
 
-		plugin_map.GetValue("plugin", plugin_owner);
+		delete enum_plugin.MapItems;
+		delete enum_plugin.ArItems;
+		delete enum_plugin.Cookie;
 
-		if(plugin != plugin_owner)
-			continue;
-		
-		plugin_map.GetValue("items array", ar);
-
-		if(plugin_map.GetValue("cookie", cookie) && cookie)
-			delete cookie;
-
-		if(plugin_map.GetValue("callbacks", data) && data)
-			delete data;
-
-		for(int item_index; item_index < ar.Length; item_index++)
-		{
-			ar.GetString(item_index, item, sizeof(item));
-
-			if(!plugin_map.GetValue(item, item_map))
-				continue;
-
-			item_map.GetValue("plugin", plugin_owner);
-
-			if(plugin != plugin_owner)
-				continue;
-			
-			if(item_map.GetValue("callbacks", data) && data)
-				delete data;
-		}
-
-		g_arPluginUniques.Erase(index);
-		g_mapPluginUniques.Remove(plugin_unique);
-
-		Unload_InCores(plugin_unique);
+		Unload_InCores(enum_plugin.Unique);
 
 		for(int i = 1; i <= MaxClients; i++)	if(Check_IsValidClient(i))
-			UnLoad_ClientCookieData(i, plugin_unique);
+			UnLoad_ClientCookieData(i, enum_plugin.Unique);
+		
+		g_arPluginUniques.Erase(index);
+		g_mapPluginUniques.Remove(enum_plugin.Unique);
 
-		delete plugin_map;
-		delete ar;
-		delete item_map;
-
+		if(Get_NowRegisterPluginId(plugin, enum_plugin))
+		{
+			delete enum_plugin.MapItems;
+			delete enum_plugin.ArItems;
+			delete enum_plugin.Cookie;
+		}
+		
 		index -= 1;
 	}
 }
