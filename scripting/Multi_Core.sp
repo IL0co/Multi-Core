@@ -16,7 +16,7 @@ public Plugin myinfo =
 	name		= "[MC] Multi-Core",
 	author	  	= "iLoco",
 	description = "Ядро, контролирующее регистрацию предметов в других ядрах",
-	version	 	= "0.1.2",
+	version	 	= "0.2.0",
 	url			= "http://hlmod.ru"
 };
 
@@ -28,7 +28,8 @@ public Plugin myinfo =
 	- если доступен только один предмет на выбор, то в VIP делать его как togglable
 	- поддерка персонального
 	- поддержка контроллера
-	- поддержка LR
+	- поддержка LR и FPS
+	- поддержка LK и LK2
 	- добавить форвард на регистрацию предмета в каком-то ядре (в процессе регистрации, что бы можно было дополнить своим)
 
 	FIXME:
@@ -38,10 +39,8 @@ public Plugin myinfo =
 */
 
 #include "multi_core/core/globals.inc"
-#include "multi_core/core/natives.inc"
-#include "multi_core/core/stuff_any.inc"
 #include "multi_core/core/stuff_errors.inc"
-#include "multi_core/core/stuff_checks.inc"
+#include "multi_core/core/natives.inc"
 #include "multi_core/core/forwards.inc"
 #include "multi_core/core/vip_core.inc"
 #include "multi_core/core/shop_core.inc"
@@ -72,6 +71,24 @@ public void OnLibraryRemoved(const char[] name)
 	Check_IsLoadLibraryName(name, false);
 }
 
+void Check_IsLoadLibraryName(const char[] name, bool isLoad)
+{
+	for(int id; id < sizeof(g_LoadCoreType); id++)		
+	{
+		if(strcmp(name, g_LoadCoreType[id], false) != 0)
+			continue;
+
+		if(isLoad)
+			g_IsCoreLoadBits |= g_LoadCoreBits[id];
+		else
+			g_IsCoreLoadBits &= ~g_LoadCoreBits[id];
+
+		CallForward_OnCoreChangeStatus(name, g_LoadCoreBits[id], isLoad);
+
+		break;
+	}
+}
+
 public void OnPluginEnd()
 {
 	if(Check_IsCoreLoaded(Core_Shop))
@@ -85,15 +102,13 @@ public void OnPluginEnd()
 
 public void OnPluginStart()
 {
-	g_mapPriorities = new StringMap();
-
 	ArrayList ar;
 	char exp[32][MAX_UNIQUE_LENGTH], plugin_unique[MAX_UNIQUE_LENGTH], buff[256];
 	
 	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_to_all.cfg");	//FIXME: добавить варны что идентификатора повторяются
 	g_kvItemsToAll = new KeyValues("MC Give To All");
 	if(!g_kvItemsToAll.ImportFromFile(buff))
-		Error_FailState_FileIsNotExist(buff);
+		Error(FILE_NOT_EXIST, _, buff);
 	
 	if(g_kvItemsToAll.GotoFirstSubKey(false))
 	{
@@ -118,17 +133,17 @@ public void OnPluginStart()
 	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_shop.cfg");		
 	g_kvItemsToShop = new KeyValues("Shop Config");
 	if(!g_kvItemsToShop.ImportFromFile(buff))
-		Error_FailState_FileIsNotExist(buff);
+		Error(FILE_NOT_EXIST, _, buff);
 	
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 
-	for(int i = 1; i <= MaxClients; i++)		if(Check_IsValidClient(i, false))
+	for(int i = 1; i <= MaxClients; i++)		if(view_as<MC_Client>(i).IsValid(false))
 		OnClientPostAdminCheck(i);
 
 	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_priorities.cfg");
 	KeyValues kv = new KeyValues("MC Priorities");
 	if(!kv.ImportFromFile(buff))
-		Error_FailState_FileIsNotExist(buff);
+		Error(FILE_NOT_EXIST, _, buff);
 
 	if(kv.GotoFirstSubKey(false))
 	{
@@ -156,7 +171,11 @@ public void OnPluginStart()
 
 	delete kv;
 
-	Check_AllLibraries();
+	g_IsCoreLoadBits = Core_MultiCore;
+
+	for(int id; id < sizeof(g_LoadCoreType); id++)		if(LibraryExists(g_LoadCoreType[id]))
+		g_IsCoreLoadBits |= g_LoadCoreBits[id];
+
 	CreateTimer(0.1, Timer_Delay_StartCore);
 
 	RegAdminCmd("sm_mc_dump", Command_Dump, ADMFLAG_ROOT);
@@ -164,48 +183,99 @@ public void OnPluginStart()
 
 public Action Command_Dump(int client, int args)
 {
-	KeyValues kv = new KeyValues("MC Dump");
+	char path[] = "addons/mc_dump.txt";
+	char buff[256], item[64];
+	KeyValues kv = new KeyValues("Multi-Core Dump");
 
-	MC_PluginId enum_plugin, enum_item;
+	MC_PluginMap mc_plugin;
+	MC_ItemMap mc_item;
+	// StringMap map;
 	ArrayList ar;
-	StringMap plugin_map, item_map;
-	char plugin_unique[MAX_UNIQUE_LENGTH], item[MAX_UNIQUE_LENGTH];
-	Handle plugin;
-	DataPack data;
-	Cookie cookie;
-
-	for(int index; index < g_arPluginUniques.Length; index++)
+	StringMapSnapshot snap = g_mapNowRegisteredPlugins.Snapshot();
+	
+	if(snap)
 	{
-		kv.Rewind();
+		kv.JumpToKey("Now Registered Plugins", true);
 
-		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
-		
-		if(!g_mapPluginUniques.GetArray(plugin_unique, enum_plugin, sizeof(enum_plugin)))
-			continue;
-
-		kv.JumpToKey(plugin_unique, true);
-
-		kv.SetNum("plugin", view_as<int>(enum_plugin.Plugin));
-		kv.SetNum("items_array", view_as<int>(enum_plugin.ArItems));
-		kv.SetNum("cookie", view_as<int>(enum_plugin.Cookie));
-
-		for(int item_index; item_index < enum_plugin.ArItems; item_index++)
+		for(int id; id < snap.Length; id++)
 		{
-			enum_plugin.ArItems.GetString(item_index, item, sizeof(item));
+			snap.GetKey(id, buff, sizeof(buff));
 
-			// if(!enum_plugin.Item("item", enum_item))
-			// 	continue;
+			if(!g_mapNowRegisteredPlugins.GetValue(buff, mc_plugin))
+				continue;
 
-			kv.SetNum(item, true);
+			kv.JumpToKey(buff, true);
+			
+			ar = mc_plugin.GetItemsArray();
+			kv.SetNum("Items Array", view_as<int>(ar));
+			kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
+			kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
+			kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
+
+			for(int num; num < ar.Length; num++)
+			{
+				ar.GetString(num, item, sizeof(item));
+
+				if(!item[0] || (mc_item = mc_plugin.GetItemMap(item)) == null)
+					continue;
+
+				kv.JumpToKey(item, true);
+				kv.SetNum("CallBacks", view_as<int>(mc_item.GetCallBacksPack()));
+			}
+
 			kv.GoBack();
 		}
+
+		kv.Rewind();		
 	}
+	else
+		kv.SetString("Now Registered Plugins", "null");
+
+	snap = g_mapPlugins.Snapshot();
+
+	if(snap)
+	{
+		kv.JumpToKey("Old Registered Plugins", true);
+
+		for(int id; id < snap.Length; id++)
+		{
+			snap.GetKey(id, buff, sizeof(buff));
+
+			if(!g_mapPlugins.GetValue(buff, mc_plugin))
+				continue;
+
+			kv.JumpToKey(buff, true);
+			
+			ar = mc_plugin.GetItemsArray();
+			kv.SetNum("Items Array", view_as<int>(ar));
+			kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
+			kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
+			kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
+
+			for(int num; num < ar.Length; num++)
+			{
+				ar.GetString(num, item, sizeof(item));
+
+				if(!item[0] || (mc_item = mc_plugin.GetItemMap(item)) == null)
+					continue;
+
+				kv.JumpToKey(item, true);
+				kv.SetNum("CallBacks", view_as<int>(mc_item.GetCallBacksPack()));
+				kv.GoBack();
+			}
+
+			kv.GoBack();
+		}
+
+		kv.Rewind();		
+	}
+	else
+		kv.SetString("Old Registered Plugins", "null");
+
 
 	kv.Rewind();
-	kv.ExportToFile("addons/mc_dump.ini");
-	ReplyToCommand(client, "Dumped to addons/mc_dump.ini");
-
-	delete kv;
+	kv.ExportToFile(path);
+	PrintToServer("[MC Core] Dumped in: %s", path);
 	return Plugin_Handled;
 }
 
@@ -220,19 +290,7 @@ public void OnClientPostAdminCheck(int client)
 		delete g_kvActiveClientList[client];
 
 	g_kvActiveClientList[client] = new KeyValues("My Data");
-
-	StringMap map;
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-
-	for(int index; index < g_arPluginUniques.Length; index++)
-	{
-		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
-
-		if(!g_mapPluginUniques.GetValue(plugin_unique, map))
-			continue;
-
-		Load_ClientCookieData(client, plugin_unique, map);
-	}
+	view_as<MC_Client>(client).LoadCookies();
 }
 
 public Action Event_PlayerDisconnect(Event event, char[] name, bool dontBroadcast)
@@ -241,4 +299,12 @@ public Action Event_PlayerDisconnect(Event event, char[] name, bool dontBroadcas
 
 	if(g_kvActiveClientList[client])
 		delete g_kvActiveClientList[client];
+}
+
+bool Check_IsCoreLoaded(MC_CoreTypeBits type)
+{
+	if(g_IsCoreLoadBits & type)
+		return true;
+
+	return false;
 }

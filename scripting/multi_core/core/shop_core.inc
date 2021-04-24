@@ -4,31 +4,30 @@ public void Shop_Started()
 {
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 
-	for(int index; index < g_arPluginUniques.Length; index++)
+	for(int index; index < g_arPlugins.Length; index++)
 	{
-		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
-		Load_Shop(plugin_unique);
+		g_arPlugins.GetString(index, plugin_unique, sizeof(plugin_unique));
+		Load_Shop(plugin_unique, false);
 	}
 }
 
-public void Load_Shop(char[] plugin_unique)
+stock void Load_Shop(char[] plugin_unique, bool check_is_core_loaded = true)
 {
-	if(!Check_IsCoreLoaded(Core_Shop))
+	if(!plugin_unique[0] || (check_is_core_loaded && !Check_IsCoreLoaded(Core_Shop)))
 		return;
 		
-	if(!Check_IsAllowRegisterInCore(plugin_unique, Core_Shop))
+	MC_PluginMap map;
+	GetPluginMap(plugin_unique, map);
+
+	if(map.DontLoadInCores & Core_Shop)
 		return;
 
-	StringMap category_map, item_map;
-	ArrayList ar;
 	char category_unique[MAX_UNIQUE_LENGTH], category_name[MAX_UNIQUE_LENGTH], item[MAX_UNIQUE_LENGTH], item_name[MAX_UNIQUE_LENGTH], in_category[MAX_UNIQUE_LENGTH];
 	CategoryId category_id;
 	int pos;
+	MC_ItemMap item_map;
 
-	Get_PluginMap(plugin_unique, _, category_map);
-	category_map.GetValue("items_array", ar);
-
-	ar = ar.Clone();
+	ArrayList ar = map.GetItemsArray().Clone();
 
 	g_kvItemsToShop.Rewind();
 	if(g_kvItemsToShop.GotoFirstSubKey())
@@ -67,13 +66,13 @@ public void Load_Shop(char[] plugin_unique)
 						continue;
 					}
 
-					category_map.GetValue(item, item_map);
+					item_map = map.GetItemMap(item);
 
-					CallBack_OnItemDisplay(0, plugin_unique, item, category_map, Core_Shop, item_name, sizeof(item_name));
+					CallBack_OnItemDisplay(0, plugin_unique, item, Core_Shop, item_name, sizeof(item_name));
 
 					Shop_SetInfo(item_name, "", g_kvItemsToShop.GetNum("Price"), g_kvItemsToShop.GetNum("Sell Price"), Item_Togglable, g_kvItemsToShop.GetNum("Duration"), g_kvItemsToShop.GetNum("Gold Price"), g_kvItemsToShop.GetNum("Gold Sell Price"));
 					Shop_SetLuckChance(g_kvItemsToShop.GetNum("Luck Chance"));
-					Shop_SetCallbacks(_, CallBack_Shop_OnItemToggled, _, CallBack_Shop_OnItemDisplay, .preview = (Check_IsItemHavePreview(item_map) ? CallBack_Shop_OnItemPreview : INVALID_FUNCTION));
+					Shop_SetCallbacks(_, CallBack_Shop_OnItemToggled, _, CallBack_Shop_OnItemDisplay, .preview = (item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW) ? CallBack_Shop_OnItemPreview : INVALID_FUNCTION));
 					Shop_SetHide(view_as<bool>(g_kvItemsToShop.GetNum("Hide", 0)));
 					Shop_EndItem();
 
@@ -86,36 +85,43 @@ public void Load_Shop(char[] plugin_unique)
 		}
 		while(g_kvItemsToShop.GotoNextKey());
 	}
+
+	delete ar;
 }
 
-public bool CallBack_Shop_OnItemDisplay(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen)
+public bool CallBack_Shop_OnItemDisplay(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item_unique, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen)
 {
-	if(CallBack_OnPluginUniqueDisplay(client, category, _, Core_Shop, buffer, maxlen))
+	char plugin_unique[MAX_UNIQUE_LENGTH];
+	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
+	
+	if(CallBack_OnItemDisplay(client, plugin_unique, item_unique, Core_Shop, buffer, maxlen))
 		return true;
 
 	return false;
 }
 
-public void CallBack_Shop_OnItemPreview(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item)
+public void CallBack_Shop_OnItemPreview(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item_unique)
 {
-	char in_category[MAX_UNIQUE_LENGTH];
-	Get_CategoryUniqueOfThisItem(category, item, in_category, sizeof(in_category));
+	char plugin_unique[MAX_UNIQUE_LENGTH];
+	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
 
-	CallBack_OnItemPreview(client, in_category, item, _, Core_Shop);
+	CallBack_OnItemPreview(client, plugin_unique, item_unique, Core_Shop);
 }
 
-public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id, const char[] category, ItemId item_id, char[] item, bool isOn, bool elapsed)
+public ShopAction CallBack_Shop_OnItemToggled(int shop_client, CategoryId category_id, const char[] category, ItemId item_id, char[] item_unique, bool isOn, bool elapsed)
 {
-	char in_category[MAX_UNIQUE_LENGTH];
-	Get_CategoryUniqueOfThisItem(category, item, in_category, sizeof(in_category));
+	MC_Client client = view_as<MC_Client>(shop_client);
+	char plugin_unique[MAX_UNIQUE_LENGTH];
+	
+	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
 
 	if(isOn || elapsed)
 	{
-		Set_ClientItem(client, in_category, "shop", "");
+		client.SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
 		return Shop_UseOff;
 	}
 		
-	Set_ClientItem(client, in_category, "shop", item);
+	client.SetSelectedItem(g_cLastSeePluginUnique[shop_client], g_hCookieKeys[Shop], item_unique);
 	return Shop_UseOn;
 }
 

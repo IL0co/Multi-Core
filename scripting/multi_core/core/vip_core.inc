@@ -7,19 +7,22 @@ public void VIP_OnVIPLoaded()
 {
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 
-	for(int index; index < g_arPluginUniques.Length; index++)
+	for(int index; index < g_arPlugins.Length; index++)
 	{
-		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
+		g_arPlugins.GetString(index, plugin_unique, sizeof(plugin_unique));
 		Load_Vip(plugin_unique);
 	}
 }
 
 void Load_Vip(char[] plugin_unique)
 {
-	if(!Check_IsCoreLoaded(Core_VIP))
+	if(!plugin_unique[0] || !Check_IsCoreLoaded(Core_VIP))
 		return;
-		
-	if(!Check_IsAllowRegisterInCore(plugin_unique, Core_VIP) || VIP_IsValidFeature(plugin_unique))
+
+	MC_PluginMap map;
+	GetPluginMap(plugin_unique, map);
+	
+	if(map.DontLoadInCores & Core_VIP || VIP_IsValidFeature(plugin_unique))
 		return;
 
 	VIP_RegisterFeature(plugin_unique, STRING, SELECTABLE, CallBack_VIP_OnItemSelected, CallBack_VIP_OnItemDisplayed, .bCookie = false);
@@ -27,57 +30,42 @@ void Load_Vip(char[] plugin_unique)
 
 public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_unique, char[] display, int maxlength)
 {
-	bool result = CallBack_OnPluginUniqueDisplay(client, plugin_unique, _, Core_VIP, display, maxlength);
-
-	if(Check_Vip_IsHaveToggleState(client, plugin_unique))
+	if(CallBack_OnPluginUniqueDisplay(client, plugin_unique, Core_VIP, display, maxlength))
 	{
-		Format(display, maxlength, "%s%s", display, Get_ClientItem(client, plugin_unique, "vip") ? " [Включено]" : " [Выключено]");
+		MC_PluginMap map;
+		GetPluginMap(plugin_unique, map);
+
+		if(!map.IsHavePreviewItem)
+		{
+			Format(display, maxlength, "%s%s", display, view_as<MC_Client>(client).GetSelectedItem(plugin_unique, g_hCookieKeys[VIP]) ? " [Включено]" : " [Выключено]");
+		}
+
+		return true;
 	}
 
-	return result;
+	return false;
 }
 
-bool Check_Vip_IsHaveToggleState(int client, const char[] plugin_unique)
+public bool CallBack_VIP_OnItemSelected(int vip_client, const char[] plugin_unique)
 {
-	StringMap plugin_map;
+	MC_Client client = view_as<MC_Client>(vip_client);
 
-	if(!Get_PluginMap(plugin_unique, _, plugin_map))
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_unique, map))
 		return false;
 
-	if(Check_IsPluginUniqueHavePreview(plugin_map))
-		return false;
-
-	char buff[MAX_UNIQUE_LENGTH];
-
-	VIP_GetClientFeatureString(client, plugin_unique, buff, sizeof(buff));
-
-	if(strcmp(buff, "all", false) != 0 || FindCharInString(buff, '|') == -1)
-		return false;
-
-	StringMap item_map;
-	if(!Get_ItemMap(plugin_unique, _, buff, item_map))
-		return false;
-
-	if(Check_IsItemHavePreview(item_map))
-		return false;
-	
-	return true;
-}
-
-public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
-{
-	if(Check_Vip_IsHaveToggleState(client, plugin_unique))
+	if(!map.IsHavePreviewItem)
 	{
-		if(Get_ClientItem(client, plugin_unique, "vip"))
+		if(client.GetSelectedItem(plugin_unique, g_hCookieKeys[VIP]))
 		{
-			Set_ClientItem(client, plugin_unique, "vip", "");
+			client.SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
 		}
 		else
 		{
-			char buff[MAX_UNIQUE_LENGTH];
-			VIP_GetClientFeatureString(client, plugin_unique, buff, sizeof(buff));
+			char item_unique[MAX_UNIQUE_LENGTH];
+			VIP_GetClientFeatureString(vip_client, plugin_unique, item_unique, sizeof(item_unique));
 
-			Set_ClientItem(client, plugin_unique, "vip", buff);
+			client.SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
 
 		return true;
@@ -85,7 +73,7 @@ public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
 
 	g_bPreviewMode[client] = false;
 
-	Menu_Vip_SelectItem(client, plugin_unique).Display(client, 0);
+	Menu_Vip_SelectItem(vip_client, plugin_unique).Display(vip_client, 0);
 	Format(g_cLastSeePluginUnique[client], sizeof(g_cLastSeePluginUnique[]), plugin_unique);
 
 	return false;
@@ -105,20 +93,22 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 	Выход
 */
 	char buff[256], translate[128], selected_item[MAX_UNIQUE_LENGTH];
-	StringMap plugin_map, item_map;
 	bool selected;
 
-	Get_PluginMap(plugin_unique, _, plugin_map);
-	Get_ClientItem(client, plugin_unique, "vip", selected_item, sizeof(selected_item));
+	MC_PluginMap plugin_map;
+	MC_ItemMap item_map;
+	GetPluginMap(plugin_unique, plugin_map);
+
+	view_as<MC_Client>(client).GetSelectedItem(plugin_unique, g_hCookieKeys[VIP], selected_item, sizeof(selected_item));
 
 	Menu menu = new Menu(MenuHandler_Vip_SelectItem);
 	menu.ExitBackButton = true;
 
-	CallBack_OnPluginUniqueDisplay(client, plugin_unique, plugin_map, Core_VIP, translate, sizeof(translate));
+	CallBack_OnPluginUniqueDisplay(client, plugin_unique, Core_VIP, translate, sizeof(translate));
 	Format(translate, sizeof(translate), "%s\n ", translate);
 	menu.SetTitle(translate);
 
-	if(Check_IsPluginUniqueHavePreview(plugin_map))
+	if(plugin_map.IsHavePreviewItem)
 	{
 		Format(translate, sizeof(translate), "Превью режим %s", g_bPreviewMode[client] ? "[Включено]" : "[Выключено]");
 		menu.AddItem("p", translate);
@@ -139,72 +129,73 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 		for(int num; num < ar.Length; num++)
 		{
 			ar.GetString(num, item, sizeof(item));
-			plugin_map.GetValue(item, item_map);
+			item_map = plugin_map.GetItemMap(item);
 
-			if(g_bPreviewMode[client] && !Check_IsItemHavePreview(item_map))
+			if(g_bPreviewMode[client] && !item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW))
 				continue;
 
 			selected = (strcmp(selected_item, item) == 0);
-			Fill_MenuByItems(menu, client, selected, plugin_unique, item, item_map);
+			Fill_MenuByItems(menu, client, selected, plugin_unique, item);
 		}
 	}
 	else
 	{
 		char exp[64][MAX_UNIQUE_LENGTH];
+
 		int count = ExplodeString(buff, ";", exp, sizeof(exp), sizeof(exp[]));
 
 		for(int num; num < count; num++)
 		{
-			if(!Get_ItemMap(plugin_unique, _, exp[num], item_map))
+			if(!(item_map = plugin_map.GetItemMap(exp[num])))
 				continue;
 			
-			if(g_bPreviewMode[client] && !Check_IsItemHavePreview(item_map))
+			if(g_bPreviewMode[client] && !item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW))
 				continue;
 
 			selected = (strcmp(selected_item, exp[num]) == 0);
-			Fill_MenuByItems(menu, client, selected, plugin_unique, exp[num], item_map);
+			Fill_MenuByItems(menu, client, selected, plugin_unique, exp[num]);
 		}
 	}
 
 	return menu;
 }
 
-void Fill_MenuByItems(Menu menu, int client, bool selected, const char[] plugin_unique, char[] item, StringMap map)
+void Fill_MenuByItems(Menu menu, int client, bool selected, const char[] plugin_unique, char[] item_unique)
 {
 	char buff[128];
 
-	CallBack_OnItemDisplay(client, plugin_unique, item, map, Core_VIP, buff, sizeof(buff));
+	CallBack_OnItemDisplay(client, plugin_unique, item_unique, Core_VIP, buff, sizeof(buff));
 
 	if(!g_bPreviewMode[client] && selected)
 	{
 		Format(buff, sizeof(buff), "%s [Выбрано]", buff);
 	}
 
-	menu.AddItem(item, buff, (!g_bPreviewMode[client] && selected) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+	menu.AddItem(item_unique, buff, (!g_bPreviewMode[client] && selected) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 }
 
 public int MenuHandler_Vip_SelectItem(Menu menu, MenuAction action, int client, int item)
 {
 	if(action == MenuAction_Select)
 	{
-		char buff[MAX_UNIQUE_LENGTH];
-		menu.GetItem(item, buff, sizeof(buff));
+		char item_unique[MAX_UNIQUE_LENGTH];
+		menu.GetItem(item, item_unique, sizeof(item_unique));
 
-		if(item == 0 && buff[0] == 'p')
+		if(item == 0 && item_unique[0] == 'p')
 		{
 			g_bPreviewMode[client] = !g_bPreviewMode[client];
 		}
-		else if(buff[0] == 'o' && (item == 0 || item == 1))
+		else if(item_unique[0] == 'o' && (item == 0 || item == 1))
 		{
-			Set_ClientItem(client, g_cLastSeePluginUnique[client], "vip", "");
+			view_as<MC_Client>(client).SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
 		}
 		else if(g_bPreviewMode[client])
 		{
-			CallBack_OnItemPreview(client, g_cLastSeePluginUnique[client], buff, _, Core_VIP);
+			CallBack_OnItemPreview(client, g_cLastSeePluginUnique[client], item_unique, Core_VIP);
 		}
 		else
 		{
-			Set_ClientItem(client, g_cLastSeePluginUnique[client], "vip", buff);
+			view_as<MC_Client>(client).SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
 
 		Menu_Vip_SelectItem(client, g_cLastSeePluginUnique[client]).DisplayAt(client, menu.Selection, 0);

@@ -1,71 +1,65 @@
 #include <sourcemod>
 
-void Error_Native_NoPluginUniqueBeingRegistered()
+enum Errors
 {
-	ThrowNativeError(SP_ERROR_PARAM, "No Plugin_Unique is being registered!");
+	COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN,		
+	COMPLETE_REGISTRATION_PREVIOUSLY_ITEM,
+	START_THE_REGISTERING_PLUGIN,
+	START_THE_REGISTERING_ITEM,
+	PLUGIN_IS_ALREADY_REGISTERED,
+	ITEM_IS_ALREADY_REGISTERED,
+	INVALID_CLIENT,
+	ERROR_INVALID_PLUGIN_ID,
+	FILE_NOT_EXIST,
 }
 
-void Error_Native_NoItemUniqueBeingRegistered()
+void Error(Errors error, any data = -1, char[] unique = "")
 {
-	ThrowNativeError(SP_ERROR_PARAM, "No Item_Unique is being registered!");
-}
+	if(error == COMPLETE_REGISTRATION_PREVIOUSLY_ITEM)
+	{
+		char item_unique[MAX_UNIQUE_LENGTH];
+		MC_ItemMap item_map;
 
-void Error_Native_PluginUniqueIsAlreadyRegistered(char[] plugin_unique)
-{
-	ThrowNativeError(SP_ERROR_PARAM, "Plugin_Unique '%s' is already registered!", plugin_unique);
-}
+		if(view_as<MC_PluginMap>(data).GetLastItemMap(item_map))
+			item_map.GetUnique(item_unique, sizeof(item_unique));
 
-// void Error_Native_ItemIsBeginRegistered()
-// {
-// 	ThrowNativeError(SP_ERROR_PARAM, "Item is being registered!");
-// }
+		ThrowNativeError(4, "Сначала закончите регистрацию предыдущего предмета! '%s'", item_unique);
+	}
+	else if(error == COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN)
+	{
+		char plugin_unique[MAX_UNIQUE_LENGTH];
+		view_as<MC_PluginMap>(data).GetUnique(plugin_unique, sizeof(plugin_unique));
 
-void Error_Native_ItemIsAlreadyRegistered(char[] item, const char[] plugin_unique)
-{
-	ThrowNativeError(SP_ERROR_PARAM, "Item '%s' is already registered on this Plugin_Unique '%s'!", item, plugin_unique);
-}
+		ThrowNativeError(4, "Сначала закончите регистрацию предыдущего плагина! '%s'", unique);
+	}
+	else if(error == START_THE_REGISTERING_PLUGIN)
+	{
+		ThrowNativeError(4, "Сначала начните регистрацию плагина!");
+	}
+	else if(error == START_THE_REGISTERING_ITEM)
+	{
+		ThrowNativeError(4, "Сначала начните регистрацию предмета!");
+	}
+	else if(error == PLUGIN_IS_ALREADY_REGISTERED)
+	{
+		ThrowNativeError(4, "Плагин уже зарегистрирован! %s", unique);
+	}
+	else if(error == INVALID_CLIENT)
+	{
+		if(!IsClientInGame(data))
+			ThrowNativeError(4, "Игрок вышел! %s", data);
+		else if(IsFakeClient(data))
+			ThrowNativeError(4, "Этот игрок - бот! %L", data);
+		else 
+			ThrowNativeError(4, "Невалидный игрок! %L", data);
 
-void Error_Native_InvalidPluginId(int plugin_id)
-{
-	ThrowNativeError(SP_ERROR_PARAM, "Invalid PluginId %i", plugin_id);
-}
-
-// void Error_Native_InvalidPluginUnique(char[] unique)
-// {
-// 	ThrowNativeError(SP_ERROR_PARAM, "Invalid Plugin '%s'", unique);
-// }
-
-void Error_Native_InvalidItemUnique(char[] plugin_unique, char[] item)
-{
-	ThrowNativeError(SP_ERROR_PARAM, "Invalid Item '%s' from Plugin_Unique '%s'", item, plugin_unique);
-}
-
-void Error_Native_FinishRegisterThePreviousItem(char[] unique)
-{
-	ThrowNativeError(SP_ERROR_PARAM, "Finish registering the previous item '%s'!", unique);
-}
-
-void Error_Native_FinishRegisterThePreviousPluginUnique(MC_PluginId enum_plugin)
-{
-	ThrowNativeError(SP_ERROR_PARAM, "Finish registering the previous Plugin_Unique '%s'!", enum_plugin.Unique);
-}
-
-// void Error_Native_FileIsNotExist(char[] path)
-// {
-// 	ThrowNativeError(SP_ERROR_PARAM, "File is not exist '%s'!", path);
-// }
-
-void Error_FailState_FileIsNotExist(char[] path)
-{
-	SetFailState("File is not exist '%s'!", path);
-}
-
-void Error_Native_CategoryIsNoRegisteredBefore(char[] item_unique)
-{
-	SetFailState("Before you start registering an item '%s', start registering Plugin_Unique", item_unique);
-}
-
-void Error_Native_CallBacksInItemIsAlreadyRegistered(char[] item_unique, char[] plugin_unique)
-{
-	SetFailState("CallBacks is already registered in Item_Unique '%s' from Plugin_Unique '%s'", item_unique, plugin_unique);
+	}
+	else if(error == ERROR_INVALID_PLUGIN_ID)
+	{
+		ThrowNativeError(4, "Invalid PluginId %i", data);
+	}
+	else if(error == FILE_NOT_EXIST)
+	{
+		SetFailState("File is not exist '%s'!", unique);
+	}
 }

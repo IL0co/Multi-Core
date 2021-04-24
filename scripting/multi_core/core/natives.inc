@@ -2,15 +2,17 @@
 
 public void LoadNatives()
 {
-	g_arPluginUniques = new ArrayList(64);
-	g_mapNowRegisteredItems = new StringMap();
-	g_mapPluginUniques = new StringMap();
+	g_arPlugins = new ArrayList(MAX_UNIQUE_LENGTH);
+	g_mapNowRegisteredPlugins = new StringMap();
+	g_mapPriorities = new StringMap();
+	g_mapPlugins = view_as<MC_PluginMap>(new StringMap());
 
 	CreateNative("MC_PrecacheFile", Native_MC_PrecacheFile);
 	CreateNative("MC_IsCoreLoaded", Native_MC_IsCoreLoaded);
 	CreateNative("MC_GetSettingsConfigKV", Native_MC_GetSettingsConfigKV);
 
 	CreateNative("MC_RegisterPlugin", Native_MC_RegisterPlugin);
+	CreateNative("MC_SetPluginCallBacks", Native_MC_SetPluginCallBacks);
 	CreateNative("MC_StartItem", Native_MC_StartItem);
 	CreateNative("MC_SetItemCallBacks", Native_MC_SetItemCallBacks);
 	CreateNative("MC_EndItem", Native_MC_EndItem);
@@ -18,161 +20,162 @@ public void LoadNatives()
 	CreateNative("MC_UnRegisterMe", Native_MC_UnRegisterMe);
 
 	CreateNative("MC_GetClientActiveItem", Native_MC_GetClientActiveItem);
-	CreateNative("MC_SetClientActiveItem", Native_MC_SetClientActiveItem);
+	CreateNative("MC_GetClientSelectedItem", Native_MC_GetClientSelectedItem);
+	CreateNative("MC_SetClientSelectedItem", Native_MC_SetClientSelectedItem);
 }
 
 public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? добавить таймер на удаление регистрации, что бы закрыть хендлы 
 {
-	MC_PluginId enum_plugin;
+	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
+	char plugin_unique[MAX_UNIQUE_LENGTH];
 
-	if(Get_NowRegisterPluginId(plugin, enum_plugin))
-		Error_Native_FinishRegisterThePreviousPluginUnique(enum_plugin);
+	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
 
-	GetNativeString(1, enum_plugin.Unique, sizeof(enum_plugin.Unique));
+	if(IsValidPluginUnique(plugin_unique))
+		Error(PLUGIN_IS_ALREADY_REGISTERED, _, plugin_unique);
 
-	if(g_arPluginUniques.FindString(enum_plugin.Unique) != -1)
-		Error_Native_PluginUniqueIsAlreadyRegistered(enum_plugin.Unique);
+	MC_PluginMap plugin_map;
+	if((plugin_map = mc_plugin.NowRegisteredMap) != null)
+		Error(COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN, plugin_map);
+
+	plugin_map = new MC_PluginMap();
+	plugin_map.SetUnique(plugin_unique);
+	plugin_map.Plugin = plugin;
+	plugin_map.DontLoadInCores = GetNativeCell(2);
+	plugin_map.Cookie = new Cookie(plugin_unique, plugin_unique, CookieAccess_Private);
+	mc_plugin.NowRegisteredMap = plugin_map;
+
+}
+
+public int Native_MC_SetPluginCallBacks(Handle plugin, int numParams)
+{
+	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
+	MC_PluginMap plugin_map;
+
+	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+		Error(START_THE_REGISTERING_PLUGIN);
 	
-	enum_plugin.Plugin = plugin;
-
-	char buff[96];
-	Format(buff, sizeof(buff), "%i", plugin);
-	g_mapNowRegisteredItems.SetArray(buff, enum_plugin, sizeof(enum_plugin));
-
-	Format(buff, sizeof(buff), "MultiCore_%s", enum_plugin.Unique);
-	enum_plugin.Cookie = new Cookie(buff, buff, CookieAccess_Private);
-
-	enum_plugin.CB_OnDisplay = GetNativeFunction(2);
-	enum_plugin.ArItems = new ArrayList(MAX_UNIQUE_LENGTH);
-	enum_plugin.MapItems = new StringMap();
-	enum_plugin.IgnoreCoresBits = GetNativeCell(3);
+	DataPack data = plugin_map.GetCallBacksPack();
+	data.WriteFunction(GetNativeFunction(1));
 }
 
 public int Native_MC_StartItem(Handle plugin, int numParams)
 {
-	MC_PluginId enum_plugin;
+	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
+	MC_PluginMap plugin_map;
 
-	if(Get_NowRegisterPluginId(plugin, enum_plugin))
-		Error_Native_FinishRegisterThePreviousPluginUnique(enum_plugin);
+	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+		Error(START_THE_REGISTERING_PLUGIN);
+	
+	MC_ItemMap item_map;
+	char item_unique[MAX_UNIQUE_LENGTH];
 
-	char item[MAX_UNIQUE_LENGTH];
-	GetNativeString(1, item, sizeof(item));
+	GetNativeString(1, item_unique, sizeof(item_unique));
 
-	if(enum_plugin.IsRegisteredNowItem)
-	{
-		enum_plugin.ArItems.GetString(enum_plugin.ArItems.Length-1, item, sizeof(item));
-		Error_Native_FinishRegisterThePreviousItem(item);
-	}
+	if(plugin_map.IsValidItem(item_unique))
+		Error(ITEM_IS_ALREADY_REGISTERED, _, item_unique);
 
-	if(enum_plugin.ArItems.FindString(item) != -1)
-	{
-		Error_Native_ItemIsAlreadyRegistered(item, enum_plugin.Unique);
-	}
+	if(plugin_map.OpenForRegistration)
+		Error(COMPLETE_REGISTRATION_PREVIOUSLY_ITEM, plugin_map);
+	
+	item_map = new MC_ItemMap();
+	item_map.SetUnique(item_unique);
+	plugin_map.SaveItem(item_map, item_unique);
+	plugin_map.OpenForRegistration = true;
 
-	MC_Item enum_item;
-	enum_item.Unique = item;
-
-	enum_plugin.MapItems.SetArray(item, enum_item, sizeof(enum_item));
-	enum_plugin.ArItems.PushString(item);
-
-	enum_plugin.IsRegisteredNowItem = true;
 	return true;
-}
-
-public int Native_MC_EndItem(Handle plugin, int numParams)
-{
-	MC_PluginId enum_plugin;
-
-	if(!Get_NowRegisterPluginId(plugin, enum_plugin))
-		Error_Native_NoPluginUniqueBeingRegistered();
-
-	MC_Item enum_item;
-
-	if(!enum_plugin.LastItem(enum_item))
-	{
-		Error_Native_NoItemUniqueBeingRegistered();
-	}
-
-	enum_plugin.IsRegisteredNowItem = false;
-}
-
-public int Native_MC_EndPlugin(Handle plugin, int numParams)
-{
-	MC_PluginId enum_plugin;
-
-	if(!Get_NowRegisterPluginId(plugin, enum_plugin))
-		Error_Native_NoPluginUniqueBeingRegistered();
-
-	if(enum_plugin.IsRegisteredNowItem == true)
-	{
-		MC_Item enum_item;
-		enum_plugin.LastItem(enum_item);
-
-		Error_Native_FinishRegisterThePreviousItem(enum_item.Unique);
-	}
-
-	int index = g_arPluginUniques.PushString(enum_plugin.Unique);
-	g_mapPluginUniques.SetArray(enum_plugin.Unique, enum_plugin, sizeof(enum_plugin));
-	
-	Load_InCores(enum_plugin.Unique);
-	g_mapNowRegisteredItems.Remove(enum_plugin.Unique);
-	
-	return index;
 }
 
 public int Native_MC_SetItemCallBacks(Handle plugin, int numParams)
 {
-	MC_PluginId enum_plugin;
+	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
+	MC_PluginMap plugin_map;
 
-	if(!Get_NowRegisterPluginId(plugin, enum_plugin))
-	{
-		Error_Native_NoPluginUniqueBeingRegistered();
-	}
+	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+		Error(START_THE_REGISTERING_PLUGIN);
+	
+	MC_ItemMap item_map;
+	plugin_map.GetLastItemMap(item_map);
 
-	MC_Item enum_item;
+	DataPack data = item_map.GetCallBacksPack();
+	data.WriteFunction(GetNativeFunction(1));
 
-	if(!enum_plugin.LastItem(enum_item))
-	{
-		Error_Native_NoItemUniqueBeingRegistered();
-	}
+	Function func = GetNativeFunction(2);
+	data.WriteFunction(func);
 
-	enum_item.CB_OnDisplay = GetNativeFunction(1);
-	enum_item.CB_OnPreview = GetNativeFunction(2);
+	if(!plugin_map.IsHavePreviewItem && func != INVALID_FUNCTION)
+		plugin_map.IsHavePreviewItem = true;
+}
+
+public int Native_MC_EndItem(Handle plugin, int numParams)
+{
+	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
+	MC_PluginMap plugin_map;
+
+	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+		Error(START_THE_REGISTERING_PLUGIN);
+	
+	if(!plugin_map.OpenForRegistration)
+		Error(START_THE_REGISTERING_ITEM);
+	
+	plugin_map.OpenForRegistration = false;
+}
+
+public int Native_MC_EndPlugin(Handle plugin, int numParams)
+{
+	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
+	MC_PluginMap plugin_map;
+
+	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+		Error(START_THE_REGISTERING_PLUGIN);
+		
+	if(plugin_map.OpenForRegistration)
+		Error(COMPLETE_REGISTRATION_PREVIOUSLY_ITEM, plugin_map);
+
+	char plugin_unique[MAX_UNIQUE_LENGTH];
+	plugin_map.GetUnique(plugin_unique, sizeof(plugin_unique));
+
+	int index = plugin_map.SaveGlobal();
+
+	Load_Vip(plugin_unique);
+	Load_Shop(plugin_unique);
+
+	mc_plugin.Remove();
+	return index;
 }
 
 public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 {
-	MC_PluginId enum_plugin;
 	char plugin_unique[MAX_UNIQUE_LENGTH];
+	MC_PluginMap map;
 
-	for(int index; index < g_arPluginUniques.Length; index++)
+	for(int id; id < g_arPlugins.Length; id++)
 	{
-		g_arPluginUniques.GetString(index, plugin_unique, sizeof(plugin_unique));
-		g_mapPluginUniques.GetArray(plugin_unique, enum_plugin, sizeof(enum_plugin));
+		g_arPlugins.GetString(id, plugin_unique, sizeof(plugin_unique));
 
-		if(enum_plugin.Plugin != plugin)
+		if(!plugin_unique[0])
 			continue;
 
-		delete enum_plugin.MapItems;
-		delete enum_plugin.ArItems;
-		delete enum_plugin.Cookie;
+		g_mapPlugins.GetValue(plugin_unique, map);
 
-		Unload_InCores(enum_plugin.Unique);
-
-		for(int i = 1; i <= MaxClients; i++)	if(Check_IsValidClient(i))
-			UnLoad_ClientCookieData(i, enum_plugin.Unique);
+		if(map.Plugin != plugin)
+			continue;
 		
-		g_arPluginUniques.Erase(index);
-		g_mapPluginUniques.Remove(enum_plugin.Unique);
+		map.UnregisterMe();
+		g_mapPlugins.Remove(plugin_unique);
+		g_arPlugins.SetString(id, "");
 
-		if(Get_NowRegisterPluginId(plugin, enum_plugin))
+		
+		if(Check_IsCoreLoaded(Core_VIP) && VIP_IsValidFeature(plugin_unique))
 		{
-			delete enum_plugin.MapItems;
-			delete enum_plugin.ArItems;
-			delete enum_plugin.Cookie;
+			VIP_UnregisterFeature(plugin_unique);
 		}
-		
-		index -= 1;
+	}
+
+	if(Check_IsCoreLoaded(Core_Shop))
+	{
+		Shop_UnregisterMe();		// FIXME: исправить костыль, сделать нормальную выгрузку с учётом наличия такого натива (Shop_UnregisterItem)
+		Shop_Started();
 	}
 }
 
@@ -183,40 +186,37 @@ public int Native_MC_PrecacheFile(Handle plugin, int numParams)
 
 	GetNativeString(1, file, sizeof(file));
 
-	if(!file)
-		return -1;
+	if(!file[0])
+		return -1;			// TODO: добавить error
 
 	TrimString(file);
 
 	MC_DataType type = view_as<MC_DataType>(GetNativeCell(2));
 	int index;
 
-	if(file[0])
+	if(type == Type_Sound)
+		PrecacheSound(file, true);
+	else if(type == Type_Particle)
 	{
-		if(type == Type_Sound)
-			PrecacheSound(file, true);
-		else if(type == Type_Particle)
-		{
-			bool save = LockStringTables(false);
-			AddToStringTable(FindStringTable("EffectDispatch"), "ParticleEffect");
-			LockStringTables(save);
-			
-			if(table == INVALID_STRING_TABLE)
-				table = FindStringTable("ParticleEffectNames");
+		bool save = LockStringTables(false);
+		AddToStringTable(FindStringTable("EffectDispatch"), "ParticleEffect");
+		LockStringTables(save);
+		
+		if(table == INVALID_STRING_TABLE)
+			table = FindStringTable("ParticleEffectNames");
 
-			save = LockStringTables(false);
-			AddToStringTable(table, file);
-			LockStringTables(save);
-		}
-		else if((FileExists(file, true) || FileExists(file, false)))
-		{
-			if(type == Type_Model)
-				index = PrecacheModel(file, true);
-			else if(type == Type_Sprite)
-				index = PrecacheDecal(file, true);
-			else if(type == Type_ParticleFile)
-				index = PrecacheGeneric(file, true);
-		}
+		save = LockStringTables(false);
+		AddToStringTable(table, file);
+		LockStringTables(save);
+	}
+	else if((FileExists(file, true) || FileExists(file, false)))
+	{
+		if(type == Type_Model)
+			index = PrecacheModel(file, true);
+		else if(type == Type_Sprite)
+			index = PrecacheDecal(file, true);
+		else if(type == Type_ParticleFile)
+			index = PrecacheGeneric(file, true);
 	}
 
 	return index;
@@ -229,85 +229,66 @@ public int Native_MC_IsCoreLoaded(Handle plugin, int numParams)
 
 public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 {
-	int client = GetNativeCell(1);
+	MC_Client client = GetNativeCell(1);
 
-	if(!Check_IsValidClient(client))
-		return false; 		// FIXME: добавить error
+	if(!client.IsValid())
+		Error(INVALID_CLIENT, client);
 
-	int plugin_id = GetNativeCell(2);
+	MC_PluginId plugin_id = GetNativeCell(2);
 
-	if(!Check_IsValidPluginId(_, plugin_id))
-		Error_Native_InvalidPluginId(plugin_id);
-
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	Convert_PluginId(_, plugin_id, plugin_unique, sizeof(plugin_unique));
-
-	ArrayList ar;
-
-	if(!Get_PluginPriorityArrayList(plugin_unique, _, ar))
+	if(!plugin_id.IsValid())					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
+	
+	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
+	
+	if(!client.GetActiveItem(plugin_unique, item_unique, sizeof(item_unique)))
 		return false;
 
-	ArrayList items_array;
-	StringMap plugin_map;
-	Get_PluginMap(plugin_unique, _, plugin_map);
-	plugin_map.GetValue("items_array", items_array);
-	
-	char item[MAX_UNIQUE_LENGTH];
-
-	for(int num; num < ar.Length; num++)
-	{
-		ar.GetString(num, item, sizeof(item));
-
-		if(!item[0])
-			continue;
-
-		if(!Get_ClientItem(client, plugin_unique, item, item, sizeof(item)))
-			continue;
-
-		if(items_array.FindString(item) == -1)
-			continue;
-
-		SetNativeString(3, item, GetNativeCell(4));
-		return true;
-	}
-
-	return false;
+	SetNativeString(3, item_unique, GetNativeCell(4));
+	return true;
 }
 
-public int Native_MC_SetClientActiveItem(Handle plugin, int numParams)
+public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 {
-	int client = GetNativeCell(1);
+	MC_Client client = GetNativeCell(1);
 
-	if(!Check_IsValidClient(client))
-		return false; 		// FIXME: добавить error
+	if(!client.IsValid())
+		Error(INVALID_CLIENT, client);
 
-	int plugin_id = GetNativeCell(2);
+	MC_PluginId plugin_id = GetNativeCell(2);
+	int core_type = GetNativeCell(3);
 
-	if(!Check_IsValidPluginId(_, plugin_id))
-		Error_Native_InvalidPluginId(plugin_id);
-
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	Convert_PluginId(_, plugin_id, plugin_unique, sizeof(plugin_unique));
-	ArrayList ar;
-
-	if(!Get_PluginPriorityArrayList(plugin_unique, _, ar))
+	if(!plugin_id.IsValid())					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
+	
+	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
+	
+	if(!client.GetSelectedItem(plugin_unique, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
 		return false;
 
-	char item[MAX_UNIQUE_LENGTH];
-	GetNativeString(4, item, sizeof(item));
-
-	if(!Check_IsValidItemUnique(plugin_unique, item))
-		Error_Native_InvalidItemUnique(plugin_unique, item);
-
-	MC_CoreTypeBits core_type = view_as<MC_CoreTypeBits>(GetNativeCell(3));
-
-	char key[32];
-	if(core_type == Core_VIP)
-		key = "vip";
-	
-	Set_ClientItem(client, plugin_unique, key, item);
-	
+	SetNativeString(4, item_unique, GetNativeCell(5));
 	return true;
+}
+
+public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
+{
+	MC_Client client = GetNativeCell(1);
+
+	if(!client.IsValid())
+		Error(INVALID_CLIENT, client);
+
+	MC_PluginId plugin_id = GetNativeCell(2);
+	int core_type = GetNativeCell(3);
+
+	if(!plugin_id.IsValid())					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
+	
+	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
+	
+	client.SetSelectedItem(plugin_unique, g_hCookieKeys[core_type], item_unique);
 }
 
 public int Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
@@ -332,4 +313,12 @@ public KeyValues GetKVFileFromPath(char[] file_name, char[] core_name, char[] bu
 {
 	BuildPath(Path_SM, buff, bufflen, "configs/multi-core/%s.cfg", file_name);
 	return (new KeyValues(core_name));
+}
+
+bool IsValidPluginUnique(char[] plugin_unique)
+{
+	if(g_arPlugins.FindString(plugin_unique) != -1)
+		return true;
+
+	return false;
 }

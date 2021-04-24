@@ -16,24 +16,21 @@ void CallForward_OnCoreChangeStatus(const char[] core_name, MC_CoreTypeBits core
 	Call_Finish();
 }
 
-bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_unique, StringMap map = null, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
+bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
 {
-    if(map == null)
-        Get_PluginMap(plugin_unique, _, map);
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_unique, map))
+		return false;
 
-    Handle plugin;
-    Function func = Get_PluginUniqueCallBackFunc(map, PLUGIN_DATAPACKPOS_DISPLAY);
-
-    map.GetValue("plugin", plugin);
-
+    Function func = map.GetCallBack(PLUGIN_DATAPACKPOS_DISPLAY);
     bool result;
 
-    if(Check_IsValidFunctionCallBack(func, plugin))
+    if(Check_IsValidFunctionCallBack(func, map.Plugin))
     {
-        Call_StartFunction(plugin, func);
+        Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_unique);
-        Call_PushCell(Convert_PluginId(plugin_unique));
+        Call_PushCell(GetPluginId(plugin_unique));
         Call_PushCell(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
         Call_PushCell(maxlen);
@@ -46,23 +43,22 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_unique, Stri
     return result;
 }
 
-bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, char[] item_unique, StringMap map = null, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
+// bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, char[] item_unique, StringMap map = null, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
+bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
 {
-    if(map == null)
-        Get_ItemMap(plugin_unique, _, item_unique, map);
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_unique, map))
+		return false;
 
-    Function func = Get_ItemCallBackFunc(map, ITEM_DATAPACKPOS_DISPLAY);
-    Handle plugin;
+    Function func = map.GetItemMap(item_unique).GetCallBack(ITEM_DATAPACKPOS_DISPLAY);
     bool result;
 
-    map.GetValue("plugin", plugin);
-
-    if(Check_IsValidFunctionCallBack(func, plugin))
+    if(Check_IsValidFunctionCallBack(func, map.Plugin))
     {
-        Call_StartFunction(plugin, func);
+        Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_unique);
-        Call_PushCell(Convert_PluginId(plugin_unique));
+        Call_PushCell(GetPluginId(plugin_unique));
         Call_PushString(item_unique);
         Call_PushCell(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
@@ -76,44 +72,59 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, char[] item_
     return result;
 }
 
-void CallBack_OnItemPreview(int client, const char[] plugin_unique, const char[] item_unique, StringMap map = null, MC_CoreTypeBits core_type)
+void CallBack_OnItemPreview(int client, const char[] plugin_unique, const char[] item_unique, MC_CoreTypeBits core_type)
 {
-    if(map == null)
-        Get_ItemMap(plugin_unique, _, item_unique, map);
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_unique, map))
+		return;
 
-    Function func = Get_ItemCallBackFunc(map, ITEM_DATAPACKPOS_PREVIEW);
-    Handle plugin;
+    Function func = map.GetItemMap(item_unique).GetCallBack(ITEM_DATAPACKPOS_PREVIEW);
 
-    map.GetValue("plugin", plugin);
-
-    if(Check_IsValidFunctionCallBack(func, plugin))
+    if(Check_IsValidFunctionCallBack(func, map.Plugin))
     {
-        Call_StartFunction(plugin, func);
+        Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_unique);
-        Call_PushCell(Convert_PluginId(plugin_unique));
+        Call_PushCell(GetPluginId(plugin_unique));
         Call_PushString(item_unique);
         Call_PushCell(core_type);
         Call_Finish();
     }
 }
 
-Function Get_PluginUniqueCallBackFunc(StringMap plugin_map, DataPackPos pos)
+bool Check_IsValidFunctionCallBack(Function func, Handle plugin)
 {
-    DataPack data;
-
-    plugin_map.GetValue("callbacks", data);
-
-    data.Position = pos;
-    return data.ReadFunction();
+    if(!Check_IsValidFunction(func) || !Check_IsValidPlugin(plugin))
+        return false;
+    
+    return true;
 }
 
-Function Get_ItemCallBackFunc(StringMap item_map, DataPackPos pos)
+bool Check_IsValidFunction(Function func)
 {
-    DataPack data;
+    if(func == INVALID_FUNCTION)
+        return false;
+    
+    return true;
+}
 
-    item_map.GetValue("callbacks", data);
-
-    data.Position = pos;
-    return data.ReadFunction();
+bool Check_IsValidPlugin(Handle plugin)
+{
+    if(!plugin)
+        return false;
+        
+	Handle hIterator = GetPluginIterator();
+	bool result = false;
+	
+	while(MorePlugins(hIterator))
+	{
+		if(plugin == ReadPlugin(hIterator))
+		{
+			result = (GetPluginStatus(plugin) == Plugin_Running);
+			break;
+		}
+	}
+	
+	delete hIterator;
+	return result;
 }
