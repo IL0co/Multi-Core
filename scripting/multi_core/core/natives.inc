@@ -135,7 +135,25 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 	plugin_map.GetUnique(plugin_unique, sizeof(plugin_unique));
 
-	int index = plugin_map.SaveGlobal();
+	DataPack data = new DataPack();
+	data.WriteString(plugin_unique);
+	CreateTimer(1.0, Timer_Delay_LoadInCores, data, TIMER_HNDL_CLOSE);
+
+	char buff[32];
+	FormatEx(buff, sizeof(buff), "%i", plugin);
+
+	g_mapNowRegisteredPlugins.Remove(buff);
+
+	return plugin_map.SaveGlobal();
+}
+
+
+public Action Timer_Delay_LoadInCores(Handle timer, DataPack data)
+{
+	data.Reset();
+
+	char plugin_unique[MAX_UNIQUE_LENGTH];
+	data.ReadString(plugin_unique, sizeof(plugin_unique));
 
 	Load_Vip(plugin_unique);
 	Load_Shop(plugin_unique);
