@@ -43,8 +43,8 @@ public Plugin myinfo =
 #include "multi_core/core/player_manager.inc"
 #include "multi_core/core/natives.inc"
 #include "multi_core/core/forwards.inc"
-#include "multi_core/core/vip_core.inc"
-#include "multi_core/core/shop_core.inc"
+#include "multi_core/core/core_vip.inc"
+#include "multi_core/core/core_shop.inc"
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {	
@@ -54,7 +54,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	MarkNativeAsOptional("VIP_UnregisterMe");
 	MarkNativeAsOptional("Shop_SetHide");
 	// MarkNativeAsOptional("Shop_UnregisterItem");
-	
+
 	LoadForwards();
 	LoadNatives();
 
