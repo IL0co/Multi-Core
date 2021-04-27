@@ -172,12 +172,13 @@ public void OnPluginStart()
 
 	delete kv;
 
+	if(!(g_IsCoreLoadBits & Core_MultiCore))
+		CreateTimer(0.1, Timer_Delay_StartCore);
+
 	g_IsCoreLoadBits = Core_MultiCore;
 
 	for(int id; id < sizeof(g_LoadCoreType); id++)		if(LibraryExists(g_LoadCoreType[id]))
 		g_IsCoreLoadBits |= g_LoadCoreBits[id];
-
-	CreateTimer(0.1, Timer_Delay_StartCore);
 
 	RegAdminCmd("sm_mc_dump", Command_Dump, ADMFLAG_ROOT);
 }
