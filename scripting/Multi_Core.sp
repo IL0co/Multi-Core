@@ -186,29 +186,28 @@ public void OnPluginStart()
 public Action Command_Dump(int client, int args)
 {
 	char path[] = "addons/mc_dump.txt";
-	char buff[256], item[64];
+	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	KeyValues kv = new KeyValues("Multi-Core Dump");
 
 	MC_PluginMap mc_plugin;
 	MC_ItemMap mc_item;
 	// StringMap map;
 	ArrayList ar;
-	StringMapSnapshot snap = g_mapNowRegisteredPlugins.Snapshot();
-	
+	StringMapSnapshot snap = g_mapPlugins.Snapshot();
+
 	if(snap)
 	{
-		kv.JumpToKey("Now Registered Plugins", true);
-
 		for(int id; id < snap.Length; id++)
 		{
-			snap.GetKey(id, buff, sizeof(buff));
+			snap.GetKey(id, plugin_unique, sizeof(plugin_unique));
 
-			if(!g_mapNowRegisteredPlugins.GetValue(buff, mc_plugin))
+			if(!g_mapPlugins.GetValue(plugin_unique, mc_plugin))
 				continue;
 
-			kv.JumpToKey(buff, true);
+			kv.JumpToKey(plugin_unique, true);
 			
 			ar = mc_plugin.GetItemsArray();
+			kv.SetNum("MC_CategoryId", g_arPlugins.FindString(plugin_unique));
 			kv.SetNum("Items Array", view_as<int>(ar));
 			kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
 			kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
@@ -216,64 +215,19 @@ public Action Command_Dump(int client, int args)
 
 			for(int num; num < ar.Length; num++)
 			{
-				ar.GetString(num, item, sizeof(item));
+				ar.GetString(num, item_unique, sizeof(item_unique));
 
-				if(!item[0] || (mc_item = mc_plugin.GetItemMap(item)) == null)
+				if(!item_unique[0] || (mc_item = mc_plugin.GetItemMap(item_unique)) == null)
 					continue;
 
-				kv.JumpToKey(item, true);
-				kv.SetNum("CallBacks", view_as<int>(mc_item.GetCallBacksPack()));
-			}
-
-			kv.GoBack();
-		}
-
-		kv.Rewind();		
-	}
-	else
-		kv.SetString("Now Registered Plugins", "null");
-
-	snap = g_mapPlugins.Snapshot();
-
-	if(snap)
-	{
-		kv.JumpToKey("Old Registered Plugins", true);
-
-		for(int id; id < snap.Length; id++)
-		{
-			snap.GetKey(id, buff, sizeof(buff));
-
-			if(!g_mapPlugins.GetValue(buff, mc_plugin))
-				continue;
-
-			kv.JumpToKey(buff, true);
-			
-			ar = mc_plugin.GetItemsArray();
-			kv.SetNum("Items Array", view_as<int>(ar));
-			kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
-			kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
-			kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
-
-			for(int num; num < ar.Length; num++)
-			{
-				ar.GetString(num, item, sizeof(item));
-
-				if(!item[0] || (mc_item = mc_plugin.GetItemMap(item)) == null)
-					continue;
-
-				kv.JumpToKey(item, true);
+				kv.JumpToKey(item_unique, true);
 				kv.SetNum("CallBacks", view_as<int>(mc_item.GetCallBacksPack()));
 				kv.GoBack();
 			}
 
 			kv.GoBack();
 		}
-
-		kv.Rewind();		
 	}
-	else
-		kv.SetString("Old Registered Plugins", "null");
-
 
 	kv.Rewind();
 	kv.ExportToFile(path);
