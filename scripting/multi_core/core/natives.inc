@@ -249,13 +249,13 @@ public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	MC_PluginId plugin_id = GetNativeCell(2);
+	int plugin_id = GetNativeCell(2);
 
-	if(!plugin_id.IsValid())					
+	if(!IsValidPluginId(plugin_id))					
 		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
 	
 	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
+	GetPluginUniqueById(plugin_id, plugin_unique, sizeof(plugin_unique));
 	
 	if(!GetPlayerActiveItem(client, plugin_unique, item_unique, sizeof(item_unique)))
 		return false;
@@ -271,14 +271,14 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	MC_PluginId plugin_id = GetNativeCell(2);
-	int core_type = GetNativeCell(3);
+	int plugin_id = GetNativeCell(2);
 
-	if(!plugin_id.IsValid())					
+	if(!IsValidPluginId(plugin_id))				
 		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
 	
+	int core_type = GetNativeCell(3);
 	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
+	GetPluginUniqueById(plugin_id, plugin_unique, sizeof(plugin_unique));
 	
 	if(!GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
 		return false;
@@ -294,14 +294,14 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	MC_PluginId plugin_id = GetNativeCell(2);
-	int core_type = GetNativeCell(3);
+	int plugin_id = GetNativeCell(2);
 
-	if(!plugin_id.IsValid())					
+	if(!IsValidPluginId(plugin_id))					
 		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
 	
+	int core_type = GetNativeCell(3);
 	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
+	GetPluginUniqueById(plugin_id, plugin_unique, sizeof(plugin_unique));
 	
 	SetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique);
 }
@@ -347,4 +347,26 @@ MC_PluginMap Get_NowRegisteredMap(Handle plugin)
 	g_mapNowRegisteredPlugins.GetValue(buff, map);
 
 	return map;
+}
+
+bool IsValidPluginId(int plugin_id)
+{
+	if(plugin_id == -1 || plugin_id >= g_arPlugins.Length)
+		return false;
+
+	char buff[1];
+	g_arPlugins.GetString(plugin_id, buff, sizeof(buff));
+
+	if(!buff[0])
+		return false;
+
+	return true;
+}
+
+bool GetPluginUniqueById(int plugin_id, char[] buffer, int maxlen)
+{
+	if(g_arPlugins.GetString(plugin_id, buffer, maxlen) == -1)
+		return false;
+
+	return true;
 }

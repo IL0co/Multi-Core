@@ -8,7 +8,6 @@ char g_hCookieKeys[][] = {"all", "vip", "shop"};
 
 enum MC_PluginMap {};
 enum MC_ItemMap {};
-enum MC_PluginId {};
 enum MC_Error {};
 
 ArrayList g_arPlugins;
@@ -68,33 +67,6 @@ methodmap MC_ItemMap < StringMap
 	{
 		delete this.GetCallBacksPack();
 		delete this;
-	}
-}
-
-methodmap MC_PluginId < ArrayList
-{
-	public bool IsValid()
-	{
-		int pos = view_as<int>(this);
-
-		if(pos == -1 || pos >= g_arPlugins.Length)
-			return false;
-	
-		char buff[1];
-		g_arPlugins.GetString(pos, buff, sizeof(buff));
-
-		if(!buff[0])
-			return false;
-
-		return true;
-	}
-
-	public bool GetUnique(char[] buffer, int maxlen)
-	{
-		if(g_arPlugins.GetString(view_as<int>(this), buffer, maxlen) == -1)
-			return false;
-
-		return true;
 	}
 }
 
