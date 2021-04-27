@@ -184,6 +184,15 @@ native MC_PluginId MC_EndPlugin();
 native void MC_UnRegisterMe();
  
 /*
+ * Проверить валидность индекса плагина
+ *	-
+ * @param plugin_id         Индекс плагина
+ *	-
+ * @return      true if all is well, false otherwise      
+*/
+native bool MC_IsValidPluginId(MC_PluginId plugin_id);
+ 
+/*
  * Получение активного предмета у игрока 
  *	-
  * @param client            Индекс игрока

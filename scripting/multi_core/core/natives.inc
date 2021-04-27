@@ -11,6 +11,8 @@ public void LoadNatives()
 	CreateNative("MC_IsCoreLoaded", Native_MC_IsCoreLoaded);
 	CreateNative("MC_GetSettingsConfigKV", Native_MC_GetSettingsConfigKV);
 
+	CreateNative("MC_IsValidPluginId", Native_MC_IsValidPluginId);
+
 	CreateNative("MC_RegisterPlugin", Native_MC_RegisterPlugin);
 	CreateNative("MC_SetPluginCallBacks", Native_MC_SetPluginCallBacks);
 	CreateNative("MC_StartItem", Native_MC_StartItem);
@@ -190,6 +192,14 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		Shop_UnregisterMe();		// FIXME: исправить костыль, сделать нормальную выгрузку с учётом наличия такого натива (Shop_UnregisterItem)
 		Shop_Started();
 	}
+}
+
+public int Native_MC_IsValidPluginId(Handle plugin, int numParams)
+{
+	if(IsValidPluginId(GetNativeCell(1)))
+		return true;
+	
+	return false;
 }
 
 public int Native_MC_PrecacheFile(Handle plugin, int numParams)
