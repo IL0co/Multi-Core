@@ -39,7 +39,7 @@ public Plugin myinfo =
 */
 
 #include "multi_core/core/globals.inc"
-#include "multi_core/core/stuff_errors.inc"
+#include "multi_core/core/errors.inc"
 #include "multi_core/core/player_manager.inc"
 #include "multi_core/core/natives.inc"
 #include "multi_core/core/forwards.inc"
