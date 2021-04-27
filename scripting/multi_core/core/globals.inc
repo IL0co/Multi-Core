@@ -9,7 +9,6 @@ char g_hCookieKeys[][] = {"all", "vip", "shop"};
 enum MC_PluginMap {};
 enum MC_ItemMap {};
 enum MC_PluginId {};
-enum MC_Plugin {};
 enum MC_Error {};
 enum MC_Client {};
 
@@ -70,38 +69,6 @@ methodmap MC_ItemMap < StringMap
 	{
 		delete this.GetCallBacksPack();
 		delete this;
-	}
-}
-
-methodmap MC_Plugin < Handle
-{
-	property MC_PluginMap NowRegisteredMap
-	{
-		public get()
-		{
-			char buff[32];
-			FormatEx(buff, sizeof(buff), "%i", this);
-
-			MC_PluginMap map;
-			g_mapNowRegisteredPlugins.GetValue(buff, map);
-
-			return map;
-		}
-		public set(MC_PluginMap map)
-		{
-			char buff[32];
-			FormatEx(buff, sizeof(buff), "%i", this);
-
-			g_mapNowRegisteredPlugins.SetValue(buff, map);
-		}
-	}
-
-	public void Remove()
-	{
-		char buff[32];
-		FormatEx(buff, sizeof(buff), "%i", this);
-
-		g_mapNowRegisteredPlugins.Remove(buff);
 	}
 }
 

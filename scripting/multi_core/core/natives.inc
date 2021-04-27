@@ -26,7 +26,6 @@ public void LoadNatives()
 
 public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? добавить таймер на удаление регистрации, что бы закрыть хендлы 
 {
-	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 
 	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
@@ -35,7 +34,7 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? д
 		Error(PLUGIN_IS_ALREADY_REGISTERED, _, plugin_unique);
 
 	MC_PluginMap plugin_map;
-	if((plugin_map = mc_plugin.NowRegisteredMap) != null)
+	if((plugin_map = Get_NowRegisteredMap(plugin)) != null)
 		Error(COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN, plugin_map);
 
 	plugin_map = new MC_PluginMap();
@@ -43,16 +42,19 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? д
 	plugin_map.Plugin = plugin;
 	plugin_map.DontLoadInCores = GetNativeCell(2);
 	plugin_map.Cookie = new Cookie(plugin_unique, plugin_unique, CookieAccess_Private);
-	mc_plugin.NowRegisteredMap = plugin_map;
+	
+	char buff[32];
+	FormatEx(buff, sizeof(buff), "%i", plugin);
+
+	g_mapNowRegisteredPlugins.SetValue(buff, plugin_map);
 
 }
 
 public int Native_MC_SetPluginCallBacks(Handle plugin, int numParams)
 {
-	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
 	MC_PluginMap plugin_map;
 
-	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+	if((plugin_map = Get_NowRegisteredMap(plugin)) == null)
 		Error(START_THE_REGISTERING_PLUGIN);
 	
 	DataPack data = plugin_map.GetCallBacksPack();
@@ -61,10 +63,9 @@ public int Native_MC_SetPluginCallBacks(Handle plugin, int numParams)
 
 public int Native_MC_StartItem(Handle plugin, int numParams)
 {
-	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
 	MC_PluginMap plugin_map;
 
-	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+	if((plugin_map = Get_NowRegisteredMap(plugin)) == null)
 		Error(START_THE_REGISTERING_PLUGIN);
 	
 	MC_ItemMap item_map;
@@ -88,10 +89,9 @@ public int Native_MC_StartItem(Handle plugin, int numParams)
 
 public int Native_MC_SetItemCallBacks(Handle plugin, int numParams)
 {
-	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
 	MC_PluginMap plugin_map;
 
-	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+	if((plugin_map = Get_NowRegisteredMap(plugin)) == null)
 		Error(START_THE_REGISTERING_PLUGIN);
 	
 	MC_ItemMap item_map;
@@ -109,10 +109,9 @@ public int Native_MC_SetItemCallBacks(Handle plugin, int numParams)
 
 public int Native_MC_EndItem(Handle plugin, int numParams)
 {
-	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
 	MC_PluginMap plugin_map;
 
-	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+	if((plugin_map = Get_NowRegisteredMap(plugin)) == null)
 		Error(START_THE_REGISTERING_PLUGIN);
 	
 	if(!plugin_map.OpenForRegistration)
@@ -123,10 +122,9 @@ public int Native_MC_EndItem(Handle plugin, int numParams)
 
 public int Native_MC_EndPlugin(Handle plugin, int numParams)
 {
-	MC_Plugin mc_plugin = view_as<MC_Plugin>(plugin);
 	MC_PluginMap plugin_map;
 
-	if((plugin_map = mc_plugin.NowRegisteredMap) == null)
+	if((plugin_map = Get_NowRegisteredMap(plugin)) == null)
 		Error(START_THE_REGISTERING_PLUGIN);
 		
 	if(plugin_map.OpenForRegistration)
@@ -158,8 +156,7 @@ public Action Timer_Delay_LoadInCores(Handle timer, DataPack data)
 	Load_Vip(plugin_unique);
 	Load_Shop(plugin_unique);
 
-	mc_plugin.Remove();
-	return index;
+	return Plugin_Stop;
 }
 
 public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
@@ -339,4 +336,15 @@ bool IsValidPluginUnique(char[] plugin_unique)
 		return true;
 
 	return false;
+}
+
+MC_PluginMap Get_NowRegisteredMap(Handle plugin)
+{
+	char buff[32];
+	FormatEx(buff, sizeof(buff), "%i", plugin);
+
+	MC_PluginMap map;
+	g_mapNowRegisteredPlugins.GetValue(buff, map);
+
+	return map;
 }
