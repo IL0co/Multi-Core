@@ -284,6 +284,21 @@ methodmap MC_PluginMap < StringMap
 		}
 	}
 
+	property Handle DeathTimer
+	{
+		public get()
+		{
+			Handle timer;
+			this.GetValue("Death Timer", timer);
+
+			return timer;
+		}
+		public set(Handle timer)
+		{
+			this.SetValue("Death Timer", timer, true);
+		}
+	}
+
 	public void UnregisterMe()
 	{
 		delete this.Cookie;

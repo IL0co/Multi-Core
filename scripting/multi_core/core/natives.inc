@@ -27,7 +27,7 @@ public void LoadNatives()
 	CreateNative("MC_SetClientSelectedItem", Native_MC_SetClientSelectedItem);
 }
 
-public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? добавить таймер на удаление регистрации, что бы закрыть хендлы 
+public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 {
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 
@@ -50,6 +50,14 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? д
 	FormatEx(buff, sizeof(buff), "%i", plugin);
 
 	g_mapNowRegisteredPlugins.SetValue(buff, plugin_map);
+
+	plugin_map.DeathTimer = CreateTimer(5.0, Timer_DeathPluginRegister, plugin_map);
+}
+
+public Action Timer_DeathPluginRegister(Handle timer, MC_PluginMap plugin_map)
+{
+	RemoveFromNowRegisteredMap(plugin_map.Plugin);
+	plugin_map.UnregisterMe();
 }
 
 public int Native_MC_SetPluginCallBacks(Handle plugin, int numParams)
@@ -139,10 +147,9 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	data.WriteString(plugin_unique);
 	CreateTimer(1.0, Timer_Delay_LoadInCores, data, TIMER_HNDL_CLOSE);
 
-	char buff[32];
-	FormatEx(buff, sizeof(buff), "%i", plugin);
-
-	g_mapNowRegisteredPlugins.Remove(buff);
+	RemoveFromNowRegisteredMap(plugin);
+	delete plugin_map.DeathTimer;
+	plugin_map.DeathTimer = null;
 
 	return plugin_map.SaveGlobal();
 }
@@ -361,6 +368,15 @@ MC_PluginMap Get_NowRegisteredMap(Handle plugin)
 	g_mapNowRegisteredPlugins.GetValue(buff, map);
 
 	return map;
+}
+
+void RemoveFromNowRegisteredMap(Handle plugin)
+{
+	char buff[32];
+	FormatEx(buff, sizeof(buff), "%i", plugin);
+
+	if(buff[0])
+		g_mapNowRegisteredPlugins.Remove(buff);
 }
 
 bool IsValidPluginId(int plugin_id)
