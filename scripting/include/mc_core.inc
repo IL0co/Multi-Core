@@ -3,7 +3,7 @@
 #define MAX_UNIQUE_LENGTH   64      // Максимальная длинна строки
 
 enum MC_CoreTypeBits    // Типы ядер
-{   
+{                           // Описание:                        | Идентификатор ядра (библиотеки):
     Core_Unloaded = 0,      // Никакое из ядер не загружено     |
     Core_MultiCore = 1,     // Ядро Multi-Core                  | multicore
     Core_Shop = 2,          // Ядро шопа                        | shop

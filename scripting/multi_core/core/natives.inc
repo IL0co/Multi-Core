@@ -47,7 +47,6 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)		// TODO: ? д
 	FormatEx(buff, sizeof(buff), "%i", plugin);
 
 	g_mapNowRegisteredPlugins.SetValue(buff, plugin_map);
-
 }
 
 public int Native_MC_SetPluginCallBacks(Handle plugin, int numParams)
@@ -145,7 +144,6 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	return plugin_map.SaveGlobal();
 }
 
-
 public Action Timer_Delay_LoadInCores(Handle timer, DataPack data)
 {
 	data.Reset();
@@ -202,7 +200,7 @@ public int Native_MC_PrecacheFile(Handle plugin, int numParams)
 	GetNativeString(1, file, sizeof(file));
 
 	if(!file[0])
-		return -1;			// TODO: добавить error
+		Error(FILE_NOT_EXIST, _, file);
 
 	TrimString(file);
 
