@@ -40,6 +40,7 @@ public Plugin myinfo =
 
 #include "multi_core/core/globals.inc"
 #include "multi_core/core/stuff_errors.inc"
+#include "multi_core/core/player_manager.inc"
 #include "multi_core/core/natives.inc"
 #include "multi_core/core/forwards.inc"
 #include "multi_core/core/vip_core.inc"
@@ -137,7 +138,7 @@ public void OnPluginStart()
 	
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 
-	for(int i = 1; i <= MaxClients; i++)		if(view_as<MC_Client>(i).IsValid(false))
+	for(int i = 1; i <= MaxClients; i++)		if(IsValidPlayer(i))
 		OnClientPostAdminCheck(i);
 
 	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_priorities.cfg");
@@ -282,23 +283,6 @@ public Action Command_Dump(int client, int args)
 public Action Timer_Delay_StartCore(Handle timer)
 {
 	CallForward_OnCoreChangeStatus("multicore", Core_MultiCore, true);
-}
-
-public void OnClientPostAdminCheck(int client)
-{
-	if(g_kvActiveClientList[client])
-		delete g_kvActiveClientList[client];
-
-	g_kvActiveClientList[client] = new KeyValues("My Data");
-	view_as<MC_Client>(client).LoadCookies();
-}
-
-public Action Event_PlayerDisconnect(Event event, char[] name, bool dontBroadcast)
-{
-	int client = GetClientOfUserId(event.GetInt("userid"));
-
-	if(g_kvActiveClientList[client])
-		delete g_kvActiveClientList[client];
 }
 
 bool Check_IsCoreLoaded(MC_CoreTypeBits type)

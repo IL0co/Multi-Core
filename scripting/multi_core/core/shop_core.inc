@@ -108,20 +108,19 @@ public void CallBack_Shop_OnItemPreview(int client, CategoryId category_id, cons
 	CallBack_OnItemPreview(client, plugin_unique, item_unique, Core_Shop);
 }
 
-public ShopAction CallBack_Shop_OnItemToggled(int shop_client, CategoryId category_id, const char[] category, ItemId item_id, char[] item_unique, bool isOn, bool elapsed)
+public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id, const char[] category, ItemId item_id, char[] item_unique, bool isOn, bool elapsed)
 {
-	MC_Client client = view_as<MC_Client>(shop_client);
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 	
 	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
 
 	if(isOn || elapsed)
 	{
-		client.SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
+		SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
 		return Shop_UseOff;
 	}
 		
-	client.SetSelectedItem(g_cLastSeePluginUnique[shop_client], g_hCookieKeys[Shop], item_unique);
+	SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], item_unique);
 	return Shop_UseOn;
 }
 

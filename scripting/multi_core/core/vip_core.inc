@@ -37,7 +37,7 @@ public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_unique,
 
 		if(!map.IsHavePreviewItem)
 		{
-			Format(display, maxlength, "%s%s", display, view_as<MC_Client>(client).GetSelectedItem(plugin_unique, g_hCookieKeys[VIP]) ? " [Включено]" : " [Выключено]");
+			Format(display, maxlength, "%s%s", display, GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]) ? " [Включено]" : " [Выключено]");
 		}
 
 		return true;
@@ -46,26 +46,24 @@ public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_unique,
 	return false;
 }
 
-public bool CallBack_VIP_OnItemSelected(int vip_client, const char[] plugin_unique)
+public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
 {
-	MC_Client client = view_as<MC_Client>(vip_client);
-
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_unique, map))
 		return false;
 
 	if(!map.IsHavePreviewItem)
 	{
-		if(client.GetSelectedItem(plugin_unique, g_hCookieKeys[VIP]))
+		if(GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]))
 		{
-			client.SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
+			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
 		}
 		else
 		{
 			char item_unique[MAX_UNIQUE_LENGTH];
-			VIP_GetClientFeatureString(vip_client, plugin_unique, item_unique, sizeof(item_unique));
+			VIP_GetClientFeatureString(client, plugin_unique, item_unique, sizeof(item_unique));
 
-			client.SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
+			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
 
 		return true;
@@ -73,7 +71,7 @@ public bool CallBack_VIP_OnItemSelected(int vip_client, const char[] plugin_uniq
 
 	g_bPreviewMode[client] = false;
 
-	Menu_Vip_SelectItem(vip_client, plugin_unique).Display(vip_client, 0);
+	Menu_Vip_SelectItem(client, plugin_unique).Display(client, 0);
 	Format(g_cLastSeePluginUnique[client], sizeof(g_cLastSeePluginUnique[]), plugin_unique);
 
 	return false;
@@ -99,7 +97,7 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 	MC_ItemMap item_map;
 	GetPluginMap(plugin_unique, plugin_map);
 
-	view_as<MC_Client>(client).GetSelectedItem(plugin_unique, g_hCookieKeys[VIP], selected_item, sizeof(selected_item));
+	GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP], selected_item, sizeof(selected_item));
 
 	Menu menu = new Menu(MenuHandler_Vip_SelectItem);
 	menu.ExitBackButton = true;
@@ -187,7 +185,7 @@ public int MenuHandler_Vip_SelectItem(Menu menu, MenuAction action, int client, 
 		}
 		else if(item_unique[0] == 'o' && (item == 0 || item == 1))
 		{
-			view_as<MC_Client>(client).SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
+			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
 		}
 		else if(g_bPreviewMode[client])
 		{
@@ -195,7 +193,7 @@ public int MenuHandler_Vip_SelectItem(Menu menu, MenuAction action, int client, 
 		}
 		else
 		{
-			view_as<MC_Client>(client).SetSelectedItem(g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
+			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
 
 		Menu_Vip_SelectItem(client, g_cLastSeePluginUnique[client]).DisplayAt(client, menu.Selection, 0);

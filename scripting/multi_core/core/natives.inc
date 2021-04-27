@@ -244,9 +244,9 @@ public int Native_MC_IsCoreLoaded(Handle plugin, int numParams)
 
 public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 {
-	MC_Client client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 
-	if(!client.IsValid())
+	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
 	MC_PluginId plugin_id = GetNativeCell(2);
@@ -257,7 +257,7 @@ public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
 	
-	if(!client.GetActiveItem(plugin_unique, item_unique, sizeof(item_unique)))
+	if(!GetPlayerActiveItem(client, plugin_unique, item_unique, sizeof(item_unique)))
 		return false;
 
 	SetNativeString(3, item_unique, GetNativeCell(4));
@@ -266,9 +266,9 @@ public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 
 public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 {
-	MC_Client client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 
-	if(!client.IsValid())
+	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
 	MC_PluginId plugin_id = GetNativeCell(2);
@@ -280,7 +280,7 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
 	
-	if(!client.GetSelectedItem(plugin_unique, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
+	if(!GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
 		return false;
 
 	SetNativeString(4, item_unique, GetNativeCell(5));
@@ -289,9 +289,9 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 
 public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 {
-	MC_Client client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 
-	if(!client.IsValid())
+	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
 	MC_PluginId plugin_id = GetNativeCell(2);
@@ -303,7 +303,7 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	plugin_id.GetUnique(plugin_unique, sizeof(plugin_unique));
 	
-	client.SetSelectedItem(plugin_unique, g_hCookieKeys[core_type], item_unique);
+	SetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique);
 }
 
 public int Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
