@@ -191,6 +191,15 @@ native void MC_UnRegisterMe();
  * @return      true if all is well, false otherwise      
 */
 native bool MC_IsValidPluginId(MC_PluginId plugin_id);
+
+/*
+ * Проверить валидность идентификатора плагина
+ *	-
+ * @param plugin_unique     Идентификатор плагина
+ *	-
+ * @return      true if all is well, false otherwise      
+*/
+native bool MC_IsValidPluginUnique(char[] plugin_unique);
  
 /*
  * Получение активного предмета у игрока 

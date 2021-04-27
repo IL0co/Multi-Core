@@ -12,6 +12,7 @@ public void LoadNatives()
 	CreateNative("MC_GetSettingsConfigKV", Native_MC_GetSettingsConfigKV);
 
 	CreateNative("MC_IsValidPluginId", Native_MC_IsValidPluginId);
+	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 
 	CreateNative("MC_RegisterPlugin", Native_MC_RegisterPlugin);
 	CreateNative("MC_SetPluginCallBacks", Native_MC_SetPluginCallBacks);
@@ -200,6 +201,17 @@ public int Native_MC_IsValidPluginId(Handle plugin, int numParams)
 		return true;
 	
 	return false;
+}
+
+public int Native_MC_IsValidPluginUnique(Handle plugin, int numParams)
+{
+	char plugin_unique[MAX_UNIQUE_LENGTH];
+	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
+
+	if(!plugin_unique[0] || !IsValidPluginUnique(plugin_unique))
+		return false;
+	
+	return true;
 }
 
 public int Native_MC_PrecacheFile(Handle plugin, int numParams)
