@@ -23,43 +23,44 @@ void Error(Errors error, any data = -1, char[] unique = "")
 		if(view_as<MC_PluginMap>(data).GetLastItemMap(item_map))
 			item_map.GetUnique(item_unique, sizeof(item_unique));
 
-		ThrowNativeError(4, "Сначала закончите регистрацию предыдущего предмета! '%s'", item_unique);
+		ThrowNativeError(4, "%T", "ERROR COMPLETE REGISTRATION PREVIOUSLY ITEM", 0, item_unique);
 	}
 	else if(error == COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN)
 	{
 		char plugin_unique[MAX_UNIQUE_LENGTH];
 		view_as<MC_PluginMap>(data).GetUnique(plugin_unique, sizeof(plugin_unique));
 
-		ThrowNativeError(4, "Сначала закончите регистрацию предыдущего плагина! '%s'", unique);
+		ThrowNativeError(4, "%T", "ERROR COMPLETE REGISTRATION PREVIOUSLY PLUGIN", 0, plugin_unique);
 	}
 	else if(error == START_THE_REGISTERING_PLUGIN)
 	{
-		ThrowNativeError(4, "Сначала начните регистрацию плагина!");
+		ThrowNativeError(4, "%T", "ERROR START THE REGISTERING PLUGIN", 0);
 	}
 	else if(error == START_THE_REGISTERING_ITEM)
 	{
-		ThrowNativeError(4, "Сначала начните регистрацию предмета!");
+		ThrowNativeError(4, "%T", "ERROR START THE REGISTERING ITEM", 0);
 	}
 	else if(error == PLUGIN_IS_ALREADY_REGISTERED)
 	{
-		ThrowNativeError(4, "Плагин уже зарегистрирован! %s", unique);
+		ThrowNativeError(4, "%T", "ERROR PLUGIN IS ALREADY REGISTERED", 0, unique);
+		ThrowNativeError(4, "%T", "ERROR PLAYER LEAVE", 0, unique);
 	}
 	else if(error == INVALID_CLIENT)
 	{
 		if(!IsClientInGame(data))
-			ThrowNativeError(4, "Игрок вышел! %s", data);
+			ThrowNativeError(4, "%T", "ERROR PLAYER LEAVE", 0, data);
 		else if(IsFakeClient(data))
-			ThrowNativeError(4, "Этот игрок - бот! %L", data);
+			ThrowNativeError(4, "%T", "ERROR PLAYER IS BOT", 0, data);
 		else 
-			ThrowNativeError(4, "Невалидный игрок! %L", data);
+			ThrowNativeError(4, "%T", "ERROR INVALID PLAYER", 0, data);
 
 	}
 	else if(error == ERROR_INVALID_PLUGIN_ID)
 	{
-		ThrowNativeError(4, "Invalid PluginId %i", data);
+		ThrowNativeError(4, "%T", "ERROR INVALID PLUGIN INDEX", 0, data);
 	}
 	else if(error == FILE_NOT_EXIST)
 	{
-		SetFailState("File is not exist '%s'!", unique);
+		ThrowNativeError(4, "%T", "ERROR FILE DOES NOT EXISTS", 0, unique);
 	}
 }

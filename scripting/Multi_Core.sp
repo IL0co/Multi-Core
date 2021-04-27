@@ -33,7 +33,6 @@ public Plugin myinfo =
 	- добавить форвард на регистрацию предмета в каком-то ядре (в процессе регистрации, что бы можно было дополнить своим)
 
 	FIXME:
-	- добавить файл перевода
 	- добавить описание предмета и "категории"
 	- Добавить CB на нажатие в каком-то меню этого предмета.
 */
@@ -181,6 +180,7 @@ public void OnPluginStart()
 		g_IsCoreLoadBits |= g_LoadCoreBits[id];
 
 	RegAdminCmd("sm_mc_dump", Command_Dump, ADMFLAG_ROOT);
+	LoadTranslations("mc_core.phrases");
 }
 
 public Action Command_Dump(int client, int args)

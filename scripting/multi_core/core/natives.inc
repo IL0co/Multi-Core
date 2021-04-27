@@ -32,7 +32,7 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 	char plugin_unique[MAX_UNIQUE_LENGTH];
 
 	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
-
+	
 	if(IsValidPluginUnique(plugin_unique))
 		Error(PLUGIN_IS_ALREADY_REGISTERED, _, plugin_unique);
 
