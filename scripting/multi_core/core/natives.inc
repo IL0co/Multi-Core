@@ -306,28 +306,22 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	SetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique);
 }
 
-public int Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
+public any Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
 {
-	char buff[256];
+	char path[256];
 	KeyValues kv;
 
-	MC_CoreTypeBits core_type = GetNativeCell(1);
+	int core_type = GetNativeCell(1);
 
-	if(core_type == Core_Shop)
-		kv = GetKVFileFromPath("settings_shop", "Shop Config", buff, sizeof(buff));
-	else
-		ThrowNativeError(4, "Config for this Core not found!");
+	kv = new KeyValues(g_hFileHeads[core_type]);
 
-	if(!kv.ImportFromFile(buff))
-		ThrowNativeError(4, "File '%s' does not funded", buff);
+	if(!kv.ImportFromFile(g_hFilePaths[core_type]))
+	{
+		delete kv;
+		Error(FILE_NOT_EXIST, _, path);
+	}
 
-	return view_as<int>(kv);
-}
-
-public KeyValues GetKVFileFromPath(char[] file_name, char[] core_name, char[] buff, int bufflen)
-{
-	BuildPath(Path_SM, buff, bufflen, "configs/multi-core/%s.cfg", file_name);
-	return (new KeyValues(core_name));
+	return kv;
 }
 
 bool IsValidPluginUnique(char[] plugin_unique)

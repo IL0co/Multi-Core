@@ -106,10 +106,10 @@ public void OnPluginStart()
 	ArrayList ar;
 	char exp[32][MAX_UNIQUE_LENGTH], plugin_unique[MAX_UNIQUE_LENGTH], buff[256];
 	
-	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_to_all.cfg");	//FIXME: добавить варны что идентификатора повторяются
+	BuildPath(Path_SM, g_hFilePaths[All], sizeof(g_hFilePaths[]), "configs/multi-core/settings_to_all.cfg");	//FIXME: добавить варны что идентификатора повторяются
 	g_kvItemsToAll = new KeyValues("MC Give To All");
-	if(!g_kvItemsToAll.ImportFromFile(buff))
-		Error(FILE_NOT_EXIST, _, buff);
+	if(!g_kvItemsToAll.ImportFromFile(g_hFilePaths[All]))
+		Error(FILE_NOT_EXIST, _, g_hFilePaths[All]);
 	
 	if(g_kvItemsToAll.GotoFirstSubKey(false))
 	{
@@ -131,10 +131,10 @@ public void OnPluginStart()
 		g_kvItemsToAll.Rewind();
 	}
 
-	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_shop.cfg");		
+	BuildPath(Path_SM, g_hFilePaths[Shop], sizeof(g_hFilePaths[]), "configs/multi-core/settings_shop.cfg");		
 	g_kvItemsToShop = new KeyValues("Shop Config");
-	if(!g_kvItemsToShop.ImportFromFile(buff))
-		Error(FILE_NOT_EXIST, _, buff);
+	if(!g_kvItemsToShop.ImportFromFile(g_hFilePaths[Shop]))
+		Error(FILE_NOT_EXIST, _, g_hFilePaths[Shop]);
 	
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 

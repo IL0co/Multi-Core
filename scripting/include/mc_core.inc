@@ -111,11 +111,11 @@ native bool MC_IsCoreLoaded(MC_CoreTypeBits core_type = Core_MultiCore);
 /*
  * Получить конфиг ядра
  *	-
- * @param core_type     Тип ядра
+ * @param type          Тип ядра
  *	-
  * @return  KeyValues handle
 */
-native KeyValues MC_GetSettingsConfigKV(MC_CoreTypeBits core_type);
+native KeyValues MC_GetSettingsConfigKV(MC_ValueOfCore type);
  
 /*
  * Зарегистрировать идентификатор плагина

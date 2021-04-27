@@ -5,6 +5,8 @@ MC_CoreTypeBits g_LoadCoreBits[] = {Core_Shop, Core_VIP};
 MC_CoreTypeBits g_IsCoreLoadBits;
 
 char g_hCookieKeys[][] = {"all", "vip", "shop"};
+char g_hFileHeads[][] = {"MC Give To All", "", "Shop Config"};		// Заголовки конфиг файлов
+char g_hFilePaths[3][256];											// Пути к конфиг файлам
 
 enum MC_PluginMap {};
 enum MC_ItemMap {};
