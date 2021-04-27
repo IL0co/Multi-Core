@@ -1,22 +1,22 @@
 #include <sourcemod>
 
-#define MAX_UNIQUE_LENGTH   64      // Максимальная длинна строки
+#define MAX_UNIQUE_LENGTH   64      // Maximum length of identifier string
 
-enum MC_CoreTypeBits    // Типы ядер
-{                           // Описание:                        | Идентификатор ядра (библиотеки):
-    Core_Unloaded = 0,      // Никакое из ядер не загружено     |
-    Core_MultiCore = 1,     // Ядро Multi-Core                  | multicore
-    Core_Shop = 2,          // Ядро шопа                        | shop
-    Core_VIP = 4,           // Ядро випки                       | vip_core
+enum MC_CoreTypeBits    // Core types
+{                           //                                  | Core (library) identifier:
+    Core_Unloaded = 0,      // None of the cores are loaded     |
+    Core_MultiCore = 1,     // Core Multi-Core                  | multicore
+    Core_Shop = 2,          // Shop Core                        | shop
+    Core_VIP = 4,           // VIP Core                         | vip_core
 }
 
-enum MC_DataType        // Типы данных
+enum MC_DataType        // Data types
 {   
-    Type_Model = 0,         // Модель (.mdl)
-    Type_Sound,             // Звук (.mp3 .wav). Без папки sound/
-    Type_Particle,          // Партикл
-    Type_ParticleFile,      // Файл партикла (.pcf)
-    Type_Sprite,            // Текстура (.vmt)
+    Type_Model = 0,         // Model (.mdl)
+    Type_Sound,             // Sound file (.mp3 .wav). No folder 'sound/'
+    Type_Particle,          // Particle (name)
+    Type_ParticleFile,      // Particle file (.pcf)
+    Type_Sprite,            // Texture (.vmt)
 }
 
 enum MC_PluginId
@@ -26,130 +26,128 @@ enum MC_PluginId
 
 enum MC_ValueOfCore
 {
-    All = 0,            // Общедоступный
-    VIP = 1,            // Из Випки
-    Shop = 2,           // Из шопа
+    All = 0,            // Public
+    VIP = 1,            // From VIP (by R1KO)
+    Shop = 2,           // From the shop (by FrozDark)
 }
 
 typeset MC_OnMenuDisplayCallback
 {
     /** 
-    *	Обратный вызов отображения имени плагина в меню
+    *	Callback to display plugin name in menu
     *	
-    *	@param client           Индекс игрока
-    *	@param plugin_unique    Идентификатор плагина
-    *	@param plugin_id        Индекс плагина
-    *   @param core_type        Тип ядра
-    *	@param buffer           Буфер, куда будет помещён результат           
-    *	@param maxlen           Размер буфера           
+    *	@param client           Player Index
+    *	@param plugin_unique    Plugin Id
+    *	@param plugin_id        Plugin index
+    *   @param core_type        Core type
+    *	@param buffer           The buffer where the result will be placed           
+    *	@param maxlen           Buffer size           
     *	
-    *	@return true - что бы отобразить новое название или не менять его, false - что бы скрыть
+    *	@return true - to display the new name or not change it, false - to hide
     */
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 
     /**
-    *	Обратный вызов отображения имени предмета в меню
+    *	Callback to display item name in menu
     *	
-    *	@param client           Индекс игрока
-    *	@param plugin_unique    Идентификатор плагина
-    *	@param plugin_id        Индекс плагина
-    *	@param item_unique      Идентификатор предмета
-    *   @param core_type        Тип ядра
-    *	@param buffer           Буфер, куда будет помещён результат           
-    *	@param maxlen           Размер буфера           
+    *	@param client           Player Index
+    *	@param plugin_unique    Plugin Id
+    *	@param plugin_id        Plugin index
+    *	@param item_unique      Item Id
+    *   @param core_type        Core type
+    *	@param buffer           The buffer where the result will be placed           
+    *	@param maxlen           Buffer size           
     *	
-    *	@return true - что бы отобразить новое название или не менять его, false - что бы скрыть
+    *	@return true - to display the new name or not change it, false - to hide
     */
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 }
 
 /**
-*	Обратный вызов превью предмета в меню
+*	Callback for menu item preview
 *	
-*	@param client           Индекс игрока
-*	@param plugin_unique    Идентификатор плагина
-*	@param plugin_id        Индекс плагина
-*	@param item_unique      Идентификатор предмета
-*   @param core_type        Тип ядра
+*	@param client           Player Index
+*	@param plugin_unique    Plugin Id
+*	@param plugin_id        Plugin index
+*	@param item_unique      Item Id
+*   @param core_type        Core type
 *	
 *	@noreturn
 */
 typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type);
 
 /*
- * Вызывается после загрузки ядра.
+ * Called after the kernel is loaded
  *	-
- * @param core_name     Имя (id) ядра
- * @param core_type     Тип ядра
- * @param isLoaded      true = ядро загрузилось
- *                      false = выгрузилось  
+ * @param core_name         Core name (id)
+ * @param core_type         Core type
+ * @param isLoaded          Is the core loaded
  *	-
  * @noreturn			
 */
 forward void MC_OnCoreChangeStatus(char[] core_name, MC_CoreTypeBits core_type, bool isLoaded);
 
 /*
- * Прекеширует файл.
+ * Precash file
  *	-
- * @param file          Путь к файлу. Название партикла и тд
- * @param data_type     Тип файла
+ * @param file              The path to the file. Particle name, etc.
+ * @param data_type         File type
  *	-
- * @return  индекс файла или -1			
+ * @return file index or -1			
 */
 native int MC_PrecacheFile(char[] file, MC_DataType data_type);
 
 /*
- * Проверка на загруженность ядра.
+ * Core load check
  *	-
- * @param core_type     Тип ядра
+ * @param core_type         Core type
  *	-
- * @return  true - загружено, 
-            false - нет
+ * @return true if all is well, false otherwise 
 */
 native bool MC_IsCoreLoaded(MC_CoreTypeBits core_type = Core_MultiCore);
 
 /*
- * Получить конфиг ядра
+ * Get core config
  *	-
- * @param type          Тип ядра
+ * @param type              Core type
  *	-
- * @return  KeyValues handle
+ * @return KeyValues handle
 */
 native KeyValues MC_GetSettingsConfigKV(MC_ValueOfCore type);
  
 /*
- * Зарегистрировать идентификатор плагина
+ * Register Plugin Id
  *	-
- * @param plugin_unique     Идентификатор плагина
- * @param dont_load         Bits индексов ядер, в которые не регистрировать данный идентификатор плагина 
+ * @param plugin_unique     Plugin Id
+ * @param dont_load         Bits indexes of cores, which do not register this Plugin Id
  *	-
  * @noreturn   
 */
 native void MC_RegisterPlugin(char[] plugin_unique, MC_CoreTypeBits dont_load = Core_Unloaded);
  
 /*
- * Добавить обратные вызова плагина
+ * Add plugin callbacks
  *	-
- * @param OnDisplay         Обратный вызов отображения в меню
+ * @param OnDisplay         Menu display callback
  *	-
  * @noreturn 
 */
 native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUNCTION);
 
 /*
- * Начать регистрацию предмета
+ * Start item registration
  *	-
- * @param item_unique       Уникальное имя предмета
+ * @param item_unique       Item Id (unique)
  *	-
- * @return      true if all is well, false otherwise 
+ * @return true if all is well, false otherwise 
 */
 native bool MC_StartItem(char[] item_unique);
 
 /*
- * Добавить обратные вызова предмета
+ * Add item callbacks
  *	-
- * @param OnDisplay         Обратный вызов отображения в меню
- * @param OnPreview         Обратный вызов превью предмета
+ * @param OnDisplay         Menu display callback
+ * @param OnPreview         Item preview callback
  *	-
  * @noreturn 
 */
@@ -157,7 +155,7 @@ native void MC_SetItemCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUN
                                 MC_OnItemPreviewCallback OnPreview = INVALID_FUNCTION);
 
 /*
- * Закончить регистрацию предмета
+ * Finish item registration
  *	-
  * @noparams
  *	-
@@ -166,16 +164,16 @@ native void MC_SetItemCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUN
 native void MC_EndItem();
  
 /*
- * Закончить регистрацию плагина
+ * Finish plugin registration
  *	-
  * @noparams
  *	-
- * @return      Индекс плагина 
+ * @return Plugin index 
 */
 native MC_PluginId MC_EndPlugin();
  
 /*
- * Выгрузить данные плагина (полностью). Обязательно должен вызываться в OnPluginEnd()
+ * Unload plugin data (completely). Must be called in OnPluginEnd()
  *	-
  * @noparams
  *	-
@@ -184,67 +182,67 @@ native MC_PluginId MC_EndPlugin();
 native void MC_UnRegisterMe();
  
 /*
- * Проверить валидность индекса плагина
+ * Check the validity of the plugin by its index
  *	-
- * @param plugin_id         Индекс плагина
+ * @param plugin_id         Plugin index
  *	-
- * @return      true if all is well, false otherwise      
+ * @return true if all is well, false otherwise      
 */
 native bool MC_IsValidPluginId(MC_PluginId plugin_id);
 
 /*
- * Проверить валидность идентификатора плагина
+ * Check the validity of the plugin by its identifier
  *	-
- * @param plugin_unique     Идентификатор плагина
+ * @param plugin_unique     Plugin Id
  *	-
- * @return      true if all is well, false otherwise      
+ * @return true if all is well, false otherwise      
 */
 native bool MC_IsValidPluginUnique(char[] plugin_unique);
  
 /*
- * Получение активного предмета у игрока 
+ * Getting an active item from a player
  *	-
- * @param client            Индекс игрока
- * @param plugin_id         Индекс плагина
- * @param buffer            Буфер, куда будет помещён результат           
- * @param maxlen            Размер буфера           
+ * @param client            Player Index
+ * @param plugin_id         Plugin index
+ * @param buffer            The buffer where the result will be placed           
+ * @param maxlen            Buffer size           
  *	-
- * @return      true if all is well, false otherwise 
+ * @return true if all is well, false otherwise 
 */
 native bool MC_GetClientActiveItem(int client, MC_PluginId plugin_id, char[] buffer, int maxlen);
  
 /*
- * Получение выбраного предмета у игрока 
+ * Getting an selected item from the player
  *	-
- * @param client            Индекс игрока
- * @param plugin_id         Индекс плагина
- * @param type              Тип ядра
- * @param buffer            Буфер, куда будет помещён результат           
- * @param maxlen            Размер буфера           
+ * @param client            Player Index
+ * @param plugin_id         Plugin index
+ * @param type              Core type
+ * @param buffer            The buffer where the result will be placed           
+ * @param maxlen            Buffer size           
  *	-
- * @return      true if all is well, false otherwise 
+ * @return true if all is well, false otherwise 
 */
 native bool MC_GetClientSelectedItem(int client, MC_PluginId plugin_id, MC_ValueOfCore type, char[] buffer, int maxlen);
  
 /*
- * Установить игроку выбранный предмет
+ * Set the selected item to the player
  *	-
- * @param client            Индекс игрока
- * @param plugin_id         Индекс плагина
- * @param type              Тип ядра
- * @param item_unique       Уникальное имя предмета (установится активным)
+ * @param client            Player Index
+ * @param plugin_id         Plugin index
+ * @param type              Core type
+ * @param item_unique       Item unique name (becomes active)
  *	-
  * @noreturn
 */
 native void MC_SetClientSelectedItem(int client, MC_PluginId plugin_id, MC_ValueOfCore type, char[] item_unique);
  
 /*
- * Получить конфиг модуля из папки 'addons/sourcemod/configs/multi-core/modules/'
+ * Get module config from folder 'addons/sourcemod/configs/multi-core/modules/'
  *	-
- * @param file_name     Имя файла
- * @param key_name      Название структуры (первый ключ)
+ * @param file_name         File name
+ * @param key_name          Structure name (first key)
  *	-
- * @return  KeyValues handle
+ * @return KeyValues handle
 */
 stock KeyValues MC_GetModuleConfigKV(char[] file_name, char[] key_name)
 {
