@@ -186,50 +186,48 @@ public void OnPluginStart()
 public Action Command_Dump(int client, int args)
 {
 	char path[] = "addons/mc_dump.txt";
-	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH], buff[128];
 	KeyValues kv = new KeyValues("Multi-Core Dump");
 
 	MC_PluginMap mc_plugin;
 	MC_ItemMap mc_item;
 	// StringMap map;
 	ArrayList ar;
-	StringMapSnapshot snap = g_mapPlugins.Snapshot();
 
-	if(snap)
+	for(int index; index < g_arPlugins.Length; index++)
 	{
-		for(int id; id < snap.Length; id++)
-		{
-			snap.GetKey(id, plugin_id, sizeof(plugin_id));
+		g_arPlugins.GetString(index, plugin_id, sizeof(plugin_id));
 
-			if(!g_mapPlugins.GetValue(plugin_id, mc_plugin))
+		if(!g_mapPlugins.GetValue(plugin_id, mc_plugin))
+			continue;
+
+		kv.JumpToKey(plugin_id, true);
+		
+		ar = mc_plugin.GetItemsArray();
+
+		GetPluginInfo(mc_plugin.Plugin, PlInfo_Name, buff, sizeof(buff));
+		kv.SetString("Registered Plugin Name", buff);
+
+		kv.SetNum("MC_CategoryId", index);
+		kv.SetNum("Items Array", view_as<int>(ar));
+		kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
+		kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
+		kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
+
+		for(int num; num < ar.Length; num++)
+		{
+			ar.GetString(num, item_unique, sizeof(item_unique));
+
+			if(!item_unique[0] || (mc_item = mc_plugin.GetItemMap(item_unique)) == null)
 				continue;
 
-			kv.JumpToKey(plugin_id, true);
-			
-			ar = mc_plugin.GetItemsArray();
-			kv.SetNum("MC_CategoryId", g_arPlugins.FindString(plugin_id));
-			kv.SetNum("Items Array", view_as<int>(ar));
-			kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
-			kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
-			kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
-
-			for(int num; num < ar.Length; num++)
-			{
-				ar.GetString(num, item_unique, sizeof(item_unique));
-
-				if(!item_unique[0] || (mc_item = mc_plugin.GetItemMap(item_unique)) == null)
-					continue;
-
-				kv.JumpToKey(item_unique, true);
-				kv.SetNum("CallBacks", view_as<int>(mc_item.GetCallBacksPack()));
-				kv.GoBack();
-			}
-
+			kv.JumpToKey(item_unique, true);
+			kv.SetNum("CallBacks", view_as<int>(mc_item.GetCallBacksPack()));
 			kv.GoBack();
 		}
+
+		kv.GoBack();
 	}
-	
-	delete snap;
 
 	kv.Rewind();
 	kv.ExportToFile(path);
