@@ -263,7 +263,15 @@ public int Native_MC_PrecacheFile(Handle plugin, int numParams)
 	int index;
 
 	if(type == Type_Sound)
-		PrecacheSound(file, true);
+	{
+		char buffer[256];
+		Format(buffer, sizeof(buffer), "sound/%s", file);
+
+		if(FileExists(buffer, false) || FileExists(buffer, true))
+			PrecacheSound(file, true);
+		else
+			Error(FILE_NOT_EXIST, _, buffer);
+	}
 	else if(type == Type_Particle)
 	{
 		bool save = LockStringTables(false);
@@ -277,8 +285,11 @@ public int Native_MC_PrecacheFile(Handle plugin, int numParams)
 		AddToStringTable(table, file);
 		LockStringTables(save);
 	}
-	else if((FileExists(file, true) || FileExists(file, false)))
+	else
 	{
+		if(!FileExists(file, true) || !FileExists(file, false))
+			Error(FILE_NOT_EXIST, _, file);
+
 		if(type == Type_Model)
 			index = PrecacheModel(file, true);
 		else if(type == Type_Sprite)
