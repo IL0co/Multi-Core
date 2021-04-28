@@ -110,14 +110,14 @@ void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] ite
     }
 }
 
-bool CallBack_OnItemSelected(int client, MC_PluginMap map, const char[] plugin_id, const char[] item_unique, MC_CoreTypeBits core_type)
+bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap item_map, const char[] plugin_id, const char[] item_unique, MC_CoreTypeBits core_type)
 {
-    Function func = map.GetCallBack(ITEM_DATAPACKPOS_SELECTED);
+    Function func = item_map.GetCallBack(ITEM_DATAPACKPOS_SELECTED);
     bool result = true;
 
-    if(Check_IsValidFunctionCallBack(func, map.Plugin))
+    if(Check_IsValidFunctionCallBack(func, plugin_map.Plugin))
     {
-        Call_StartFunction(map.Plugin, func);
+        Call_StartFunction(plugin_map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
         Call_PushCell(GetPluginId(plugin_id));

@@ -113,19 +113,21 @@ public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id
 	char plugin_id[MAX_UNIQUE_LENGTH];
 	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_id, sizeof(plugin_id));
 
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
+	MC_PluginMap plugin_map;
+	if(!GetPluginMap(plugin_id, plugin_map))
 		return Shop_Raw;
+
+	MC_ItemMap item_map = plugin_map.GetItemMap(item_unique);
 
 	if(isOn || elapsed)
 	{
-		if(CallBack_OnItemSelected(client, map, plugin_id, "", Core_Shop))
+		if(CallBack_OnItemSelected(client, plugin_map, item_map, plugin_id, "", Core_Shop))
 			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
 			
 		return Shop_UseOff;
 	}
 		
-	if(CallBack_OnItemSelected(client, map, plugin_id, item_unique, Core_Shop))
+	if(CallBack_OnItemSelected(client, plugin_map, item_map, plugin_id, item_unique, Core_Shop))
 		SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], item_unique);
 
 	return Shop_UseOn;
