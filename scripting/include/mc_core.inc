@@ -307,7 +307,7 @@ stock KeyValues MC_GetModuleConfigKV(char[] file_name, char[] key_name)
 
 public SharedPlugin __pl_mc_core = 
 {
-	name = "mc_core",
+	name = "multicore",
 	file = "mc_core.smx",
 #if defined REQUIRE_PLUGIN
 	required = 1,
