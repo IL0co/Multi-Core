@@ -239,6 +239,15 @@ native bool MC_IsValidPluginIndex(MC_PluginIndex plugin_index);
 native bool MC_IsValidPluginUnique(char[] plugin_id);
  
 /*
+ * Get the number of plugins I have registered
+ *	-
+ * @noparams
+ *	-
+ * @return number of registered plugin ids      
+*/
+native int MC_GetPluginsCountRegisteredByMe();
+ 
+/*
  * Getting an active item from a player
  *	-
  * @param client            Player Index
@@ -325,5 +334,6 @@ public void __pl_mc_core_SetNTVOptional()
 	MarkNativeAsOptional("MC_GetClientActiveItem");
 	MarkNativeAsOptional("MC_GetClientSelectedItem");
 	MarkNativeAsOptional("MC_SetClientSelectedItem");
+	MarkNativeAsOptional("MC_GetPluginsCountRegisteredByMe");
 }
 #endif

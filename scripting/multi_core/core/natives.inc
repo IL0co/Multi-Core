@@ -13,6 +13,7 @@ public void LoadNatives()
 
 	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
+	CreateNative("MC_GetPluginsCountRegisteredByMe", Native_MC_GetPluginsCountRegisteredByMe);
 
 	CreateNative("MC_RegisterPlugin", Native_MC_RegisterPlugin);
 	CreateNative("MC_SetPluginCallBacks", Native_MC_SetPluginCallBacks);
@@ -222,6 +223,28 @@ public int Native_MC_IsValidPluginUnique(Handle plugin, int numParams)
 		return false;
 	
 	return true;
+}
+
+public int Native_MC_GetPluginsCountRegisteredByMe(Handle plugin, int numParams)
+{
+	int count;
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	MC_PluginMap map;
+
+	for(int index; index < g_arPlugins.Length; index++)
+	{
+		g_arPlugins.GetString(index, plugin_id, sizeof(plugin_id));
+
+		if(!plugin_id[0])
+			continue;
+
+		GetPluginMap(plugin_id, map);
+		
+		if(map.Plugin == plugin)
+			count++;
+	}
+
+	return count;
 }
 
 public int Native_MC_PrecacheFile(Handle plugin, int numParams)
