@@ -27,10 +27,10 @@ void Error(Errors error, any data = -1, char[] unique = "")
 	}
 	else if(error == COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN)
 	{
-		char plugin_unique[MAX_UNIQUE_LENGTH];
-		view_as<MC_PluginMap>(data).GetUnique(plugin_unique, sizeof(plugin_unique));
+		char plugin_id[MAX_UNIQUE_LENGTH];
+		view_as<MC_PluginMap>(data).GetUnique(plugin_id, sizeof(plugin_id));
 
-		ThrowNativeError(4, "%T", "ERROR COMPLETE REGISTRATION PREVIOUSLY PLUGIN", 0, plugin_unique);
+		ThrowNativeError(4, "%T", "ERROR COMPLETE REGISTRATION PREVIOUSLY PLUGIN", 0, plugin_id);
 	}
 	else if(error == START_THE_REGISTERING_PLUGIN)
 	{

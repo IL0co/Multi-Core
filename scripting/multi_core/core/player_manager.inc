@@ -28,11 +28,11 @@ bool IsValidPlayer(int client, bool check_kv = false)
     return true;
 }
 
-bool GetPlayerSelectedItem(int client, const char[] plugin_unique, char[] core_type, char[] buffer = "", int maxlen = 0)
+bool GetPlayerSelectedItem(int client, const char[] plugin_id, char[] core_type, char[] buffer = "", int maxlen = 0)
 {
     g_kvActiveClientList[client].Rewind();
 
-    if(!g_kvActiveClientList[client].JumpToKey(plugin_unique))
+    if(!g_kvActiveClientList[client].JumpToKey(plugin_id))
         return false;
 
     g_kvActiveClientList[client].GetString(core_type, buffer, maxlen);
@@ -43,24 +43,24 @@ bool GetPlayerSelectedItem(int client, const char[] plugin_unique, char[] core_t
     return false;
 }
 
-void SetPlayerSelectedItem(int client, char[] plugin_unique, char[] core_type, char[] item_unique)
+void SetPlayerSelectedItem(int client, char[] plugin_id, char[] core_type, char[] item_unique)
 {
     g_kvActiveClientList[client].Rewind();
-    g_kvActiveClientList[client].JumpToKey(plugin_unique, true);
+    g_kvActiveClientList[client].JumpToKey(plugin_id, true);
     g_kvActiveClientList[client].SetString(core_type, item_unique);
 
-    SavePlayerCookie(client, plugin_unique);
+    SavePlayerCookie(client, plugin_id);
 }
 
-bool GetPlayerActiveItem(int client, char[] plugin_unique, char[] buffer, int maxlen)
+bool GetPlayerActiveItem(int client, char[] plugin_id, char[] buffer, int maxlen)
 {
     ArrayList arPriorities;
 
-    if(!g_mapPriorities.GetValue(plugin_unique, arPriorities))
+    if(!g_mapPriorities.GetValue(plugin_id, arPriorities))
         return false;
 
     MC_PluginMap map;
-    GetPluginMap(plugin_unique, map);
+    GetPluginMap(plugin_id, map);
     ArrayList arItems = map.GetItemsArray();
 
     if(!arItems.Length) 
@@ -72,7 +72,7 @@ bool GetPlayerActiveItem(int client, char[] plugin_unique, char[] buffer, int ma
     {
         arPriorities.GetString(num, core_type, sizeof(core_type));
 
-        if(!GetPlayerSelectedItem(client, plugin_unique, core_type, item_unique, sizeof(item_unique)))
+        if(!GetPlayerSelectedItem(client, plugin_id, core_type, item_unique, sizeof(item_unique)))
             continue;
 
         if(arItems.FindString(item_unique) == -1)
@@ -85,10 +85,10 @@ bool GetPlayerActiveItem(int client, char[] plugin_unique, char[] buffer, int ma
     return false;
 }
 
-void SavePlayerCookie(int client, char[] plugin_unique)
+void SavePlayerCookie(int client, char[] plugin_id)
 {
     g_kvActiveClientList[client].Rewind();
-    g_kvActiveClientList[client].JumpToKey(plugin_unique);
+    g_kvActiveClientList[client].JumpToKey(plugin_id);
 
     char buffer[256], item_unique[MAX_UNIQUE_LENGTH];
 
@@ -99,7 +99,7 @@ void SavePlayerCookie(int client, char[] plugin_unique)
     }
     
     MC_PluginMap map;
-    GetPluginMap(plugin_unique, map);
+    GetPluginMap(plugin_id, map);
 
     map.Cookie.Set(client, buffer);
 }
@@ -107,27 +107,27 @@ void SavePlayerCookie(int client, char[] plugin_unique)
 
 void LoadPlayerCookies(int client)
 {
-    char plugin_unique[MAX_UNIQUE_LENGTH];
+    char plugin_id[MAX_UNIQUE_LENGTH];
     char buffer[256], exp[sizeof(g_hCookieKeys)][64];
     MC_PluginMap map;
     Cookie cookie;
 
     for(int id; id < g_arPlugins.Length; id++)
     {
-        g_arPlugins.GetString(id, plugin_unique, sizeof(plugin_unique));
+        g_arPlugins.GetString(id, plugin_id, sizeof(plugin_id));
         
-        if(!plugin_unique[0] || !g_mapPlugins.GetValue(plugin_unique, map))
+        if(!plugin_id[0] || !g_mapPlugins.GetValue(plugin_id, map))
             continue;
 
         g_kvActiveClientList[client].Rewind();
-        g_kvActiveClientList[client].JumpToKey(plugin_unique, true);
+        g_kvActiveClientList[client].JumpToKey(plugin_id, true);
 
         cookie = map.Cookie;
 
         if(cookie.GetClientTime(client) == 0)
         {
             g_kvItemsToAll.Rewind();
-            ArrayList ar = view_as<ArrayList>(g_kvItemsToAll.GetNum(plugin_unique));
+            ArrayList ar = view_as<ArrayList>(g_kvItemsToAll.GetNum(plugin_id));
 
             if(ar)
             {

@@ -29,22 +29,22 @@ public void LoadNatives()
 
 public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
+	char plugin_id[MAX_UNIQUE_LENGTH];
 
-	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
+	GetNativeString(1, plugin_id, sizeof(plugin_id));
 	
-	if(IsValidPluginUnique(plugin_unique))
-		Error(PLUGIN_IS_ALREADY_REGISTERED, _, plugin_unique);
+	if(IsValidPluginUnique(plugin_id))
+		Error(PLUGIN_IS_ALREADY_REGISTERED, _, plugin_id);
 
 	MC_PluginMap plugin_map;
 	if((plugin_map = Get_NowRegisteredMap(plugin)) != null)
 		Error(COMPLETE_REGISTRATION_PREVIOUSLY_PLUGIN, plugin_map);
 
 	plugin_map = new MC_PluginMap();
-	plugin_map.SetUnique(plugin_unique);
+	plugin_map.SetUnique(plugin_id);
 	plugin_map.Plugin = plugin;
 	plugin_map.DontLoadInCores = GetNativeCell(2);
-	plugin_map.Cookie = new Cookie(plugin_unique, plugin_unique, CookieAccess_Private);
+	plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Private);
 	
 	char buff[32];
 	FormatEx(buff, sizeof(buff), "%i", plugin);
@@ -143,11 +143,11 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	if(plugin_map.OpenForRegistration)
 		Error(COMPLETE_REGISTRATION_PREVIOUSLY_ITEM, plugin_map);
 
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	plugin_map.GetUnique(plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	plugin_map.GetUnique(plugin_id, sizeof(plugin_id));
 
 	DataPack data = new DataPack();
-	data.WriteString(plugin_unique);
+	data.WriteString(plugin_id);
 	CreateTimer(1.0, Timer_Delay_LoadInCores, data, TIMER_HNDL_CLOSE);
 
 	RemoveFromNowRegisteredMap(plugin);
@@ -161,40 +161,40 @@ public Action Timer_Delay_LoadInCores(Handle timer, DataPack data)
 {
 	data.Reset();
 
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	data.ReadString(plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	data.ReadString(plugin_id, sizeof(plugin_id));
 
-	Load_Vip(plugin_unique);
-	Load_Shop(plugin_unique);
+	Load_Vip(plugin_id);
+	Load_Shop(plugin_id);
 
 	return Plugin_Stop;
 }
 
 public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
+	char plugin_id[MAX_UNIQUE_LENGTH];
 	MC_PluginMap map;
 
 	for(int id; id < g_arPlugins.Length; id++)
 	{
-		g_arPlugins.GetString(id, plugin_unique, sizeof(plugin_unique));
+		g_arPlugins.GetString(id, plugin_id, sizeof(plugin_id));
 
-		if(!plugin_unique[0])
+		if(!plugin_id[0])
 			continue;
 
-		g_mapPlugins.GetValue(plugin_unique, map);
+		g_mapPlugins.GetValue(plugin_id, map);
 
 		if(map.Plugin != plugin)
 			continue;
 		
 		map.UnregisterMe();
-		g_mapPlugins.Remove(plugin_unique);
+		g_mapPlugins.Remove(plugin_id);
 		g_arPlugins.SetString(id, "");
 
 		
-		if(Check_IsCoreLoaded(Core_VIP) && VIP_IsValidFeature(plugin_unique))
+		if(Check_IsCoreLoaded(Core_VIP) && VIP_IsValidFeature(plugin_id))
 		{
-			VIP_UnregisterFeature(plugin_unique);
+			VIP_UnregisterFeature(plugin_id);
 		}
 	}
 
@@ -215,10 +215,10 @@ public int Native_MC_IsValidPluginId(Handle plugin, int numParams)
 
 public int Native_MC_IsValidPluginUnique(Handle plugin, int numParams)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	GetNativeString(1, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetNativeString(1, plugin_id, sizeof(plugin_id));
 
-	if(!plugin_unique[0] || !IsValidPluginUnique(plugin_unique))
+	if(!plugin_id[0] || !IsValidPluginUnique(plugin_id))
 		return false;
 	
 	return true;
@@ -279,15 +279,15 @@ public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	int plugin_id = GetNativeCell(2);
+	int plugin_index = GetNativeCell(2);
 
-	if(!IsValidPluginId(plugin_id))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
+	if(!IsValidPluginId(plugin_index))					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
 	
-	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	GetPluginUniqueById(plugin_id, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
 	
-	if(!GetPlayerActiveItem(client, plugin_unique, item_unique, sizeof(item_unique)))
+	if(!GetPlayerActiveItem(client, plugin_id, item_unique, sizeof(item_unique)))
 		return false;
 
 	SetNativeString(3, item_unique, GetNativeCell(4));
@@ -301,16 +301,16 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	int plugin_id = GetNativeCell(2);
+	int plugin_index = GetNativeCell(2);
 
-	if(!IsValidPluginId(plugin_id))				
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
+	if(!IsValidPluginId(plugin_index))				
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
 	
 	int core_type = GetNativeCell(3);
-	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	GetPluginUniqueById(plugin_id, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
 	
-	if(!GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
+	if(!GetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
 		return false;
 
 	SetNativeString(4, item_unique, GetNativeCell(5));
@@ -324,16 +324,16 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	int plugin_id = GetNativeCell(2);
+	int plugin_index = GetNativeCell(2);
 
-	if(!IsValidPluginId(plugin_id))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_id);
+	if(!IsValidPluginId(plugin_index))					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
 	
 	int core_type = GetNativeCell(3);
-	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	GetPluginUniqueById(plugin_id, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
 	
-	SetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[core_type], item_unique);
+	SetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[core_type], item_unique);
 }
 
 public any Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
@@ -354,9 +354,9 @@ public any Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
 	return kv;
 }
 
-bool IsValidPluginUnique(char[] plugin_unique)
+bool IsValidPluginUnique(char[] plugin_id)
 {
-	if(g_arPlugins.FindString(plugin_unique) != -1)
+	if(g_arPlugins.FindString(plugin_id) != -1)
 		return true;
 
 	return false;
@@ -382,13 +382,13 @@ void RemoveFromNowRegisteredMap(Handle plugin)
 		g_mapNowRegisteredPlugins.Remove(buff);
 }
 
-bool IsValidPluginId(int plugin_id)
+bool IsValidPluginId(int plugin_index)
 {
-	if(plugin_id == -1 || plugin_id >= g_arPlugins.Length)
+	if(plugin_index == -1 || plugin_index >= g_arPlugins.Length)
 		return false;
 
 	char buff[1];
-	g_arPlugins.GetString(plugin_id, buff, sizeof(buff));
+	g_arPlugins.GetString(plugin_index, buff, sizeof(buff));
 
 	if(!buff[0])
 		return false;
@@ -396,9 +396,9 @@ bool IsValidPluginId(int plugin_id)
 	return true;
 }
 
-bool GetPluginUniqueById(int plugin_id, char[] buffer, int maxlen)
+bool GetPluginUniqueById(int plugin_index, char[] buffer, int maxlen)
 {
-	if(g_arPlugins.GetString(plugin_id, buffer, maxlen) == -1)
+	if(g_arPlugins.GetString(plugin_index, buffer, maxlen) == -1)
 		return false;
 
 	return true;

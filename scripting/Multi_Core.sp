@@ -102,7 +102,7 @@ public void OnPluginEnd()
 public void OnPluginStart()
 {
 	ArrayList ar;
-	char exp[32][MAX_UNIQUE_LENGTH], plugin_unique[MAX_UNIQUE_LENGTH], buff[256];
+	char exp[32][MAX_UNIQUE_LENGTH], plugin_id[MAX_UNIQUE_LENGTH], buff[256];
 	
 	BuildPath(Path_SM, g_hFilePaths[All], sizeof(g_hFilePaths[]), "configs/multi-core/settings_to_all.cfg");	//FIXME: добавить варны что идентификатора повторяются
 	g_kvItemsToAll = new KeyValues("MC Give To All");
@@ -113,7 +113,7 @@ public void OnPluginStart()
 	{
 		do
 		{
-			g_kvItemsToAll.GetSectionName(plugin_unique, sizeof(plugin_unique));
+			g_kvItemsToAll.GetSectionName(plugin_id, sizeof(plugin_id));
 			g_kvItemsToAll.GetString(NULL_STRING, buff, sizeof(buff));
 			
 			ar = new ArrayList();
@@ -148,9 +148,9 @@ public void OnPluginStart()
 	{
 		do
 		{
-			kv.GetSectionName(plugin_unique, sizeof(plugin_unique));
+			kv.GetSectionName(plugin_id, sizeof(plugin_id));
 
-			if(g_mapPriorities.GetValue(plugin_unique, ar))		// TODO: добавить варн, что предмет повторяется
+			if(g_mapPriorities.GetValue(plugin_id, ar))		// TODO: добавить варн, что предмет повторяется
 				continue;
 
 			kv.GetString(NULL_STRING, buff, sizeof(buff));
@@ -159,7 +159,7 @@ public void OnPluginStart()
 				continue;
 
 			ar = new ArrayList();
-			g_mapPriorities.SetValue(plugin_unique, ar);
+			g_mapPriorities.SetValue(plugin_id, ar);
 
 			int count = ExplodeString(buff, " ", exp, sizeof(exp), sizeof(exp[]));
 			for(int num; num < count; num++)		if(exp[num][0])
@@ -185,7 +185,7 @@ public void OnPluginStart()
 public Action Command_Dump(int client, int args)
 {
 	char path[] = "addons/mc_dump.txt";
-	char plugin_unique[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
+	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	KeyValues kv = new KeyValues("Multi-Core Dump");
 
 	MC_PluginMap mc_plugin;
@@ -198,15 +198,15 @@ public Action Command_Dump(int client, int args)
 	{
 		for(int id; id < snap.Length; id++)
 		{
-			snap.GetKey(id, plugin_unique, sizeof(plugin_unique));
+			snap.GetKey(id, plugin_id, sizeof(plugin_id));
 
-			if(!g_mapPlugins.GetValue(plugin_unique, mc_plugin))
+			if(!g_mapPlugins.GetValue(plugin_id, mc_plugin))
 				continue;
 
-			kv.JumpToKey(plugin_unique, true);
+			kv.JumpToKey(plugin_id, true);
 			
 			ar = mc_plugin.GetItemsArray();
-			kv.SetNum("MC_CategoryId", g_arPlugins.FindString(plugin_unique));
+			kv.SetNum("MC_CategoryId", g_arPlugins.FindString(plugin_id));
 			kv.SetNum("Items Array", view_as<int>(ar));
 			kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
 			kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));

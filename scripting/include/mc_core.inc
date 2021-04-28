@@ -19,9 +19,9 @@ enum MC_DataType        // Data types
     Type_Sprite,            // Texture (.vmt)
 }
 
-enum MC_PluginId
+enum MC_PluginIndex
 {
-    INVALID_PLUGIN_ID = -1,
+    INVALID_PLUGIN_INDEX = -1,
 }
 
 enum MC_ValueOfCore
@@ -37,22 +37,22 @@ typeset MC_OnMenuDisplayCallbacks
      * Callback to display plugin name in menu
      *  -
      * @param client           Player Index
-     * @param plugin_unique    Plugin Id
-     * @param plugin_id        Plugin index
+     * @param plugin_id        Plugin Id
+     * @param plugin_index     Plugin index
      * @param core_type        Core type
      * @param buffer           The buffer where the result will be placed           
      * @param maxlen           Buffer size           
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 
     /*
      * Callback to display item name in menu
      *  -
      * @param client           Player Index
-     * @param plugin_unique    Plugin Id
-     * @param plugin_id        Plugin index
+     * @param plugin_id        Plugin Id
+     * @param plugin_index     Plugin index
      * @param item_unique      Item Id
      * @param core_type        Core type
      * @param buffer           The buffer where the result will be placed           
@@ -60,7 +60,7 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 }
 
 typeset MC_OnMenuSelectedCallbacks
@@ -69,22 +69,22 @@ typeset MC_OnMenuSelectedCallbacks
      * Callback when selecting a plugin from the menu
      *  -
      * @param client           Player Index
-     * @param plugin_unique    Plugin Id
-     * @param plugin_id        Plugin index
+     * @param plugin_id        Plugin Id
+     * @param plugin_index     Plugin index
      * @param core_type        Core type
      * @param buffer           The buffer where the result will be placed           
      * @param maxlen           Buffer size           
      *  -
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, MC_CoreTypeBits core_type);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, MC_CoreTypeBits core_type);
 
     /*
      * Callback when selecting a item from the menu
      *	-
      * @param client           Player Index
-     * @param plugin_unique    Plugin Id
-     * @param plugin_id        Plugin index
+     * @param plugin_id        Plugin Id
+     * @param plugin_index     Plugin index
      * @param core_type        Core type
      * @param item_unique      Item Id (can be empty if turned off)
      * @param buffer           The buffer where the result will be placed           
@@ -92,21 +92,21 @@ typeset MC_OnMenuSelectedCallbacks
      *	-
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type);
 }
 
 /*
  * Callback for menu item preview
  *  -
- * @param client           Player Index
- * @param plugin_unique    Plugin Id
- * @param plugin_id        Plugin index
- * @param item_unique      Item Id
- * @param core_type        Core type
+ * @param client            Player Index
+ * @param plugin_id         Plugin Id
+ * @param plugin_index      Plugin index
+ * @param item_unique       Item Id
+ * @param core_type         Core type
  *	-
  * @noreturn
 */
-typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type);
+typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type);
 
 /*
  * Called after the kernel is loaded
@@ -150,12 +150,12 @@ native KeyValues MC_GetSettingsConfigKV(MC_ValueOfCore type);
 /*
  * Register Plugin Id
  *	-
- * @param plugin_unique     Plugin Id
+ * @param plugin_id         Plugin Id
  * @param dont_load         Bits indexes of cores, which do not register this Plugin Id
  *	-
  * @noreturn   
 */
-native void MC_RegisterPlugin(char[] plugin_unique, MC_CoreTypeBits dont_load = Core_Unloaded);
+native void MC_RegisterPlugin(char[] plugin_id, MC_CoreTypeBits dont_load = Core_Unloaded);
  
 /*
  * Add plugin callbacks
@@ -187,7 +187,7 @@ native bool MC_StartItem(char[] item_unique);
  * @noreturn 
 */
 native void MC_SetItemCallBacks(MC_OnMenuDisplayCallbacks OnDisplay = INVALID_FUNCTION,
-                                MC_OnItemPreviewCallback OnPreview = INVALID_FUNCTION
+                                MC_OnItemPreviewCallback OnPreview = INVALID_FUNCTION,
                                 MC_OnMenuSelectedCallbacks OnSelect = INVALID_FUNCTION);
 
 /*
@@ -206,7 +206,7 @@ native void MC_EndItem();
  *	-
  * @return Plugin index 
 */
-native MC_PluginId MC_EndPlugin();
+native MC_PluginIndex MC_EndPlugin();
  
 /*
  * Unload plugin data (completely). Must be called in OnPluginEnd()
@@ -220,57 +220,57 @@ native void MC_UnRegisterMe();
 /*
  * Check the validity of the plugin by its index
  *	-
- * @param plugin_id         Plugin index
+ * @param plugin_index         Plugin index
  *	-
  * @return true if all is well, false otherwise      
 */
-native bool MC_IsValidPluginId(MC_PluginId plugin_id);
+native bool MC_IsValidPluginId(MC_PluginIndex plugin_index);
 
 /*
  * Check the validity of the plugin by its identifier
  *	-
- * @param plugin_unique     Plugin Id
+ * @param plugin_id     Plugin Id
  *	-
  * @return true if all is well, false otherwise      
 */
-native bool MC_IsValidPluginUnique(char[] plugin_unique);
+native bool MC_IsValidPluginUnique(char[] plugin_id);
  
 /*
  * Getting an active item from a player
  *	-
  * @param client            Player Index
- * @param plugin_id         Plugin index
+ * @param plugin_index      Plugin index
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientActiveItem(int client, MC_PluginId plugin_id, char[] buffer, int maxlen);
+native bool MC_GetClientActiveItem(int client, MC_PluginIndex plugin_index, char[] buffer, int maxlen);
  
 /*
  * Getting an selected item from the player
  *	-
  * @param client            Player Index
- * @param plugin_id         Plugin index
+ * @param plugin_index      Plugin index
  * @param type              Core type
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientSelectedItem(int client, MC_PluginId plugin_id, MC_ValueOfCore type, char[] buffer, int maxlen);
+native bool MC_GetClientSelectedItem(int client, MC_PluginIndex plugin_index, MC_ValueOfCore type, char[] buffer, int maxlen);
  
 /*
  * Set the selected item to the player
  *	-
  * @param client            Player Index
- * @param plugin_id         Plugin index
+ * @param plugin_index      Plugin index
  * @param type              Core type
  * @param item_unique       Item unique name (becomes active)
  *	-
  * @noreturn
 */
-native void MC_SetClientSelectedItem(int client, MC_PluginId plugin_id, MC_ValueOfCore type, char[] item_unique);
+native void MC_SetClientSelectedItem(int client, MC_PluginIndex plugin_index, MC_ValueOfCore type, char[] item_unique);
  
 /*
  * Get module config from folder 'addons/sourcemod/configs/multi-core/modules/'

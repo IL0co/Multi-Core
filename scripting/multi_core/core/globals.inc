@@ -94,9 +94,9 @@ methodmap MC_PluginMap < StringMap
 		return false;
 	}
 
-	public void SetUnique(char[] plugin_unique)
+	public void SetUnique(char[] plugin_id)
 	{
-		this.SetString("Unique", plugin_unique);
+		this.SetString("Unique", plugin_id);
 	}
 
 	public ArrayList GetItemsArray()
@@ -117,11 +117,11 @@ methodmap MC_PluginMap < StringMap
 
 	public int SaveGlobal()
 	{
-		char plugin_unique[MAX_UNIQUE_LENGTH];
-		this.GetUnique(plugin_unique, sizeof(plugin_unique));
+		char plugin_id[MAX_UNIQUE_LENGTH];
+		this.GetUnique(plugin_id, sizeof(plugin_id));
 
-		g_mapPlugins.SetValue(plugin_unique, this, true);
-		return g_arPlugins.PushString(plugin_unique);
+		g_mapPlugins.SetValue(plugin_id, this, true);
+		return g_arPlugins.PushString(plugin_id);
 	}
 
 	public void SaveItem(MC_ItemMap item_map, char[] item_unique)
@@ -152,14 +152,14 @@ methodmap MC_PluginMap < StringMap
 		return false;
 	}
 
-	public bool IsValid(char[] plugin_unique)
+	public bool IsValid(char[] plugin_id)
 	{
-		if(!plugin_unique[0])
+		if(!plugin_id[0])
 			return false;
 
 		StringMap map;
 
-		if(this.GetValue(plugin_unique, map))
+		if(this.GetValue(plugin_id, map))
 			return true;
 
 		return false;
@@ -312,15 +312,15 @@ methodmap MC_PluginMap < StringMap
 	}
 }
 
-public bool GetPluginMap(const char[] plugin_unique, MC_PluginMap &map)
+public bool GetPluginMap(const char[] plugin_id, MC_PluginMap &map)
 {
-	if(g_mapPlugins.GetValue(plugin_unique, map))
+	if(g_mapPlugins.GetValue(plugin_id, map))
 		return true;
 
 	return false;
 }
 
-public int GetPluginId(const char[] plugin_unique)
+public int GetPluginId(const char[] plugin_id)
 {
-	return g_arPlugins.FindString(plugin_unique);
+	return g_arPlugins.FindString(plugin_id);
 }

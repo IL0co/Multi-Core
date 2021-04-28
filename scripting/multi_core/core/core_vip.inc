@@ -5,39 +5,39 @@ char g_cLastSeePluginUnique[MAXPLAYERS+1][MAX_UNIQUE_LENGTH];
 
 public void VIP_OnVIPLoaded()
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
+	char plugin_id[MAX_UNIQUE_LENGTH];
 
 	for(int index; index < g_arPlugins.Length; index++)
 	{
-		g_arPlugins.GetString(index, plugin_unique, sizeof(plugin_unique));
-		Load_Vip(plugin_unique);
+		g_arPlugins.GetString(index, plugin_id, sizeof(plugin_id));
+		Load_Vip(plugin_id);
 	}
 }
 
-void Load_Vip(char[] plugin_unique)
+void Load_Vip(char[] plugin_id)
 {
-	if(!plugin_unique[0] || !Check_IsCoreLoaded(Core_VIP))
+	if(!plugin_id[0] || !Check_IsCoreLoaded(Core_VIP))
 		return;
 
 	MC_PluginMap map;
-	GetPluginMap(plugin_unique, map);
+	GetPluginMap(plugin_id, map);
 	
-	if(map.DontLoadInCores & Core_VIP || VIP_IsValidFeature(plugin_unique))
+	if(map.DontLoadInCores & Core_VIP || VIP_IsValidFeature(plugin_id))
 		return;
 
-	VIP_RegisterFeature(plugin_unique, STRING, SELECTABLE, CallBack_VIP_OnItemSelected, CallBack_VIP_OnItemDisplayed, .bCookie = false);
+	VIP_RegisterFeature(plugin_id, STRING, SELECTABLE, CallBack_VIP_OnItemSelected, CallBack_VIP_OnItemDisplayed, .bCookie = false);
 }
 
-public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_unique, char[] display, int maxlength)
+public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_id, char[] display, int maxlength)
 {
-	if(CallBack_OnPluginUniqueDisplay(client, plugin_unique, Core_VIP, display, maxlength))
+	if(CallBack_OnPluginUniqueDisplay(client, plugin_id, Core_VIP, display, maxlength))
 	{
 		MC_PluginMap map;
-		GetPluginMap(plugin_unique, map);
+		GetPluginMap(plugin_id, map);
 
 		if(!map.IsHavePreviewItem)
 		{
-			Format(display, maxlength, "%s%T", display, (GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]) ? "ENABLED" : "DISABLED"), client);
+			Format(display, maxlength, "%s%T", display, (GetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[VIP]) ? "ENABLED" : "DISABLED"), client);
 		}
 
 		return true;
@@ -46,25 +46,25 @@ public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_unique,
 	return false;
 }
 
-public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
+public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_id)
 {
 	MC_PluginMap map;
-	if(!GetPluginMap(plugin_unique, map))
+	if(!GetPluginMap(plugin_id, map))
 		return false;
 
-	if(!CallBack_OnPluginSelected(client, map, plugin_unique, Core_VIP))
+	if(!CallBack_OnPluginSelected(client, map, plugin_id, Core_VIP))
 		return true;
 
 	if(!map.IsHavePreviewItem)
 	{
-		if(GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]))
+		if(GetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[VIP]))
 		{
 			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
 		}
 		else
 		{
 			char item_unique[MAX_UNIQUE_LENGTH];
-			VIP_GetClientFeatureString(client, plugin_unique, item_unique, sizeof(item_unique));
+			VIP_GetClientFeatureString(client, plugin_id, item_unique, sizeof(item_unique));
 
 			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
@@ -74,13 +74,13 @@ public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
 
 	g_bPreviewMode[client] = false;
 
-	Menu_Vip_SelectItem(client, plugin_unique).Display(client, 0);
-	Format(g_cLastSeePluginUnique[client], sizeof(g_cLastSeePluginUnique[]), plugin_unique);
+	Menu_Vip_SelectItem(client, plugin_id).Display(client, 0);
+	Format(g_cLastSeePluginUnique[client], sizeof(g_cLastSeePluginUnique[]), plugin_id);
 
 	return false;
 }
 
-public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
+public Menu Menu_Vip_SelectItem(int client, const char[] plugin_id)
 {
 /* 
 	Имя идентификатора плагина
@@ -98,14 +98,14 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 
 	MC_PluginMap plugin_map;
 	MC_ItemMap item_map;
-	GetPluginMap(plugin_unique, plugin_map);
+	GetPluginMap(plugin_id, plugin_map);
 
-	GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP], selected_item, sizeof(selected_item));
+	GetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[VIP], selected_item, sizeof(selected_item));
 
 	Menu menu = new Menu(MenuHandler_Vip_SelectItem);
 	menu.ExitBackButton = true;
 
-	CallBack_OnPluginUniqueDisplay(client, plugin_unique, Core_VIP, translate, sizeof(translate));
+	CallBack_OnPluginUniqueDisplay(client, plugin_id, Core_VIP, translate, sizeof(translate));
 	Format(translate, sizeof(translate), "%s\n ", translate);
 	menu.SetTitle(translate);
 
@@ -123,7 +123,7 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 	Format(translate, sizeof(translate), "%T%s\n ", "DISABLE", client, translate);
 	menu.AddItem("o", translate, (g_bPreviewMode[client] || !selected_item[0]) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 
-	VIP_GetClientFeatureString(client, plugin_unique, buff, sizeof(buff));
+	VIP_GetClientFeatureString(client, plugin_id, buff, sizeof(buff));
 
 	if(strcmp(buff, "all", false) == 0)
 	{
@@ -141,7 +141,7 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 				continue;
 
 			selected = (strcmp(selected_item, item) == 0);
-			Fill_MenuByItems(menu, client, selected, plugin_unique, item);
+			Fill_MenuByItems(menu, client, selected, plugin_id, item);
 		}
 	}
 	else
@@ -159,18 +159,18 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 				continue;
 
 			selected = (strcmp(selected_item, exp[num]) == 0);
-			Fill_MenuByItems(menu, client, selected, plugin_unique, exp[num]);
+			Fill_MenuByItems(menu, client, selected, plugin_id, exp[num]);
 		}
 	}
 
 	return menu;
 }
 
-void Fill_MenuByItems(Menu menu, int client, bool selected, const char[] plugin_unique, char[] item_unique)
+void Fill_MenuByItems(Menu menu, int client, bool selected, const char[] plugin_id, char[] item_unique)
 {
 	char buff[128];
 
-	CallBack_OnItemDisplay(client, plugin_unique, item_unique, Core_VIP, buff, sizeof(buff));
+	CallBack_OnItemDisplay(client, plugin_id, item_unique, Core_VIP, buff, sizeof(buff));
 
 	if(!g_bPreviewMode[client] && selected)
 	{

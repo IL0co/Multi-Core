@@ -2,22 +2,22 @@
 
 public void Shop_Started()
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
+	char plugin_id[MAX_UNIQUE_LENGTH];
 
 	for(int index; index < g_arPlugins.Length; index++)
 	{
-		g_arPlugins.GetString(index, plugin_unique, sizeof(plugin_unique));
-		Load_Shop(plugin_unique, false);
+		g_arPlugins.GetString(index, plugin_id, sizeof(plugin_id));
+		Load_Shop(plugin_id, false);
 	}
 }
 
-stock void Load_Shop(char[] plugin_unique, bool check_is_core_loaded = true)
+stock void Load_Shop(char[] plugin_id, bool check_is_core_loaded = true)
 {
-	if(!plugin_unique[0] || (check_is_core_loaded && !Check_IsCoreLoaded(Core_Shop)))
+	if(!plugin_id[0] || (check_is_core_loaded && !Check_IsCoreLoaded(Core_Shop)))
 		return;
 		
 	MC_PluginMap map;
-	GetPluginMap(plugin_unique, map);
+	GetPluginMap(plugin_id, map);
 
 	if(map.DontLoadInCores & Core_Shop)
 		return;
@@ -51,11 +51,11 @@ stock void Load_Shop(char[] plugin_unique, bool check_is_core_loaded = true)
 						continue;
 					}
 
-					if(strcmp(category_unique, plugin_unique, false) != 0)
+					if(strcmp(category_unique, plugin_id, false) != 0)
 					{
 						g_kvItemsToShop.GetString("In Category", in_category, sizeof(in_category));
 						
-						if(!in_category[0] || strcmp(in_category, plugin_unique, false) != 0)
+						if(!in_category[0] || strcmp(in_category, plugin_id, false) != 0)
 						{
 							continue;
 						}
@@ -68,7 +68,7 @@ stock void Load_Shop(char[] plugin_unique, bool check_is_core_loaded = true)
 
 					item_map = map.GetItemMap(item);
 
-					CallBack_OnItemDisplay(0, plugin_unique, item, Core_Shop, item_name, sizeof(item_name));
+					CallBack_OnItemDisplay(0, plugin_id, item, Core_Shop, item_name, sizeof(item_name));
 
 					Shop_SetInfo(item_name, "", g_kvItemsToShop.GetNum("Price"), g_kvItemsToShop.GetNum("Sell Price"), Item_Togglable, g_kvItemsToShop.GetNum("Duration"), g_kvItemsToShop.GetNum("Gold Price"), g_kvItemsToShop.GetNum("Gold Sell Price"));
 					Shop_SetLuckChance(g_kvItemsToShop.GetNum("Luck Chance"));
@@ -91,10 +91,10 @@ stock void Load_Shop(char[] plugin_unique, bool check_is_core_loaded = true)
 
 public bool CallBack_Shop_OnItemDisplay(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item_unique, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_id, sizeof(plugin_id));
 	
-	if(CallBack_OnItemDisplay(client, plugin_unique, item_unique, Core_Shop, buffer, maxlen))
+	if(CallBack_OnItemDisplay(client, plugin_id, item_unique, Core_Shop, buffer, maxlen))
 		return true;
 
 	return false;
@@ -102,30 +102,30 @@ public bool CallBack_Shop_OnItemDisplay(int client, CategoryId category_id, cons
 
 public void CallBack_Shop_OnItemPreview(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item_unique)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_id, sizeof(plugin_id));
 
-	CallBack_OnItemPreview(client, plugin_unique, item_unique, Core_Shop);
+	CallBack_OnItemPreview(client, plugin_id, item_unique, Core_Shop);
 }
 
 public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id, const char[] category, ItemId item_id, char[] item_unique, bool isOn, bool elapsed)
 {
-	char plugin_unique[MAX_UNIQUE_LENGTH];
-	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_id, sizeof(plugin_id));
 
 	MC_PluginMap map;
-	if(!GetPluginMap(plugin_unique, map))
+	if(!GetPluginMap(plugin_id, map))
 		return Shop_Raw;
 
 	if(isOn || elapsed)
 	{
-		if(CallBack_OnItemSelected(client, map, plugin_unique, "", Core_Shop))
+		if(CallBack_OnItemSelected(client, map, plugin_id, "", Core_Shop))
 			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
 			
 		return Shop_UseOff;
 	}
 		
-	if(CallBack_OnItemSelected(client, map, plugin_unique, item_unique, Core_Shop))
+	if(CallBack_OnItemSelected(client, map, plugin_id, item_unique, Core_Shop))
 		SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], item_unique);
 
 	return Shop_UseOn;
