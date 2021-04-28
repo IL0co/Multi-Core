@@ -13,7 +13,7 @@
 
 public Plugin myinfo =
 {
-	name		= "[MC] Multi-Core",
+	name		= "[Multi-Core] Core",
 	author	  	= "iLoco",
 	description = "Ядро, контролирующее регистрацию предметов в других ядрах",
 	version	 	= "0.2.0",
