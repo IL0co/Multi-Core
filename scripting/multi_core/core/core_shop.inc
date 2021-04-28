@@ -111,16 +111,23 @@ public void CallBack_Shop_OnItemPreview(int client, CategoryId category_id, cons
 public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id, const char[] category, ItemId item_id, char[] item_unique, bool isOn, bool elapsed)
 {
 	char plugin_unique[MAX_UNIQUE_LENGTH];
-	
 	Get_CategoryUniqueOfThisItem(category, item_unique, plugin_unique, sizeof(plugin_unique));
+
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_unique, map))
+		return Shop_Raw;
 
 	if(isOn || elapsed)
 	{
-		SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
+		if(CallBack_OnItemSelected(client, map, plugin_unique, "", Core_Shop))
+			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
+			
 		return Shop_UseOff;
 	}
 		
-	SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], item_unique);
+	if(CallBack_OnItemSelected(client, map, plugin_unique, item_unique, Core_Shop))
+		SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], item_unique);
+
 	return Shop_UseOn;
 }
 

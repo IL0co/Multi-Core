@@ -24,6 +24,7 @@ stock DataPackPos PLUGIN_DATAPACKPOS_SELECTED	= view_as<DataPackPos>(1);
 
 stock DataPackPos ITEM_DATAPACKPOS_DISPLAY		= view_as<DataPackPos>(0);
 stock DataPackPos ITEM_DATAPACKPOS_PREVIEW		= view_as<DataPackPos>(1);
+stock DataPackPos ITEM_DATAPACKPOS_SELECTED		= view_as<DataPackPos>(2);
 
 KeyValues g_kvActiveClientList[MAXPLAYERS+1];	
 

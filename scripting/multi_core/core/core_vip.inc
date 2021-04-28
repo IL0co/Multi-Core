@@ -187,13 +187,17 @@ public int MenuHandler_Vip_SelectItem(Menu menu, MenuAction action, int client, 
 		char item_unique[MAX_UNIQUE_LENGTH];
 		menu.GetItem(item, item_unique, sizeof(item_unique));
 
+		MC_PluginMap map;
+		GetPluginMap(g_cLastSeePluginUnique[client], map);
+	
 		if(item == 0 && item_unique[0] == 'p')
 		{
 			g_bPreviewMode[client] = !g_bPreviewMode[client];
 		}
 		else if(item_unique[0] == 'o' && (item == 0 || item == 1))
 		{
-			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
+			if(CallBack_OnItemSelected(client, map, g_cLastSeePluginUnique[client], "", Core_VIP))
+				SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], "");
 		}
 		else if(g_bPreviewMode[client])
 		{
@@ -201,7 +205,8 @@ public int MenuHandler_Vip_SelectItem(Menu menu, MenuAction action, int client, 
 		}
 		else
 		{
-			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
+			if(CallBack_OnItemSelected(client, map, g_cLastSeePluginUnique[client], item_unique, Core_VIP))
+				SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
 
 		Menu_Vip_SelectItem(client, g_cLastSeePluginUnique[client]).DisplayAt(client, menu.Selection, 0);

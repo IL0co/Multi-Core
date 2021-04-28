@@ -34,7 +34,6 @@ public Plugin myinfo =
 
 	FIXME:
 	- добавить описание предмета и "категории"
-	- Добавить CB на нажатие в каком-то меню этого предмета.
 */
 
 #include "multi_core/core/globals.inc"
