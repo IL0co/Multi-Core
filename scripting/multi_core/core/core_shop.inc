@@ -133,9 +133,14 @@ public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id
 
 void Get_CategoryUniqueOfThisItem(const char[] shop_category, const char[] item, char[] buffer, int maxlen)		// FIXME: сделать нормально, заменить на ранее сделанную карту
 {
-	g_kvItemsToShop.Rewind();
-	g_kvItemsToShop.JumpToKey(shop_category);
-	g_kvItemsToShop.JumpToKey(item);
+	if(g_arPlugins.FindString(shop_category) != -1)
+		FormatEx(buffer, maxlen, shop_category);
+	else
+	{
+		g_kvItemsToShop.Rewind();
+		g_kvItemsToShop.JumpToKey(shop_category);
+		g_kvItemsToShop.JumpToKey(item);
 
-	g_kvItemsToShop.GetString("In Category", buffer, maxlen);
+		g_kvItemsToShop.GetString("In Category", buffer, maxlen);
+	}
 }
