@@ -227,7 +227,7 @@ native void MC_UnRegisterMe();
  *	-
  * @return true if all is well, false otherwise      
 */
-native bool MC_IsValidPluginId(MC_PluginIndex plugin_index);
+native bool MC_IsValidPluginIndex(MC_PluginIndex plugin_index);
 
 /*
  * Check the validity of the plugin by its identifier
@@ -320,7 +320,7 @@ public void __pl_mc_core_SetNTVOptional()
 	MarkNativeAsOptional("MC_EndItem");
 	MarkNativeAsOptional("MC_EndPlugin");
 	MarkNativeAsOptional("MC_UnRegisterMe");
-	MarkNativeAsOptional("MC_IsValidPluginId");
+	MarkNativeAsOptional("MC_IsValidPluginIndex");
 	MarkNativeAsOptional("MC_IsValidPluginUnique");
 	MarkNativeAsOptional("MC_GetClientActiveItem");
 	MarkNativeAsOptional("MC_GetClientSelectedItem");

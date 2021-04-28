@@ -11,7 +11,7 @@ public void LoadNatives()
 	CreateNative("MC_IsCoreLoaded", Native_MC_IsCoreLoaded);
 	CreateNative("MC_GetSettingsConfigKV", Native_MC_GetSettingsConfigKV);
 
-	CreateNative("MC_IsValidPluginId", Native_MC_IsValidPluginId);
+	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 
 	CreateNative("MC_RegisterPlugin", Native_MC_RegisterPlugin);
