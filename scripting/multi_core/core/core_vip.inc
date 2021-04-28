@@ -115,7 +115,7 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_id)
 		menu.AddItem("p", translate);
 	}
 
-	if(selected_item[0])
+	if(!selected_item[0])
 		Format(translate, sizeof(translate), "%T", "SELECTED", client);
 	else 
 		translate[0] = '\0';
