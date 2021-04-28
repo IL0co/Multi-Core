@@ -62,6 +62,10 @@ methodmap MC_ItemMap < StringMap
 	public Function GetCallBack(DataPackPos pos)
 	{
 		DataPack data = this.GetCallBacksPack();
+
+		if(!data)
+			return INVALID_FUNCTION;
+
 		data.Position = pos; 
 
 		return data.ReadFunction();
@@ -207,6 +211,10 @@ methodmap MC_PluginMap < StringMap
 	public Function GetCallBack(DataPackPos pos)
 	{
 		DataPack data = this.GetCallBacksPack();
+
+		if(!data)
+			return INVALID_FUNCTION;
+
 		data.Position = pos; 
 
 		return data.ReadFunction();
