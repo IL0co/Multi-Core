@@ -30,6 +30,13 @@
 		"en"		"Disable"
 	}
 	
+	"HINT DRAW PREVIEW TIME"
+	{
+		"#format"   "{1:1.1f}"
+		"ru"		"<pre><span face='monospace'>Превью <font color='#0dff00'><span class='fontSize-l'>{1} </span></font></span></pre>"
+		"en"		"<pre><span face='monospace'>Preview <font color='#0dff00'><span class='fontSize-l'>{1} </span></font></span></pre>"
+	}
+
 	"ERROR COMPLETE REGISTRATION PREVIOUSLY ITEM"
 	{
 		"#format"   	"{1:s}"
