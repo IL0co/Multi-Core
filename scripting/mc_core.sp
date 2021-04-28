@@ -34,6 +34,7 @@ public Plugin myinfo =
 
 	FIXME:
 	- добавить описание предмета и "категории"
+	- добавить draw callbacks
 */
 
 #include "multi_core/core/globals.inc"
