@@ -295,3 +295,35 @@ stock KeyValues MC_GetModuleConfigKV(char[] file_name, char[] key_name)
 
 	return kv;
 }
+
+public SharedPlugin __pl_mc_core = 
+{
+	name = "mc_core",
+	file = "mc_core.smx",
+#if defined REQUIRE_PLUGIN
+	required = 1,
+#else
+	required = 0,
+#endif
+};
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_mc_core_SetNTVOptional()
+{
+	MarkNativeAsOptional("MC_PrecacheFile");
+	MarkNativeAsOptional("MC_IsCoreLoaded");
+	MarkNativeAsOptional("MC_GetSettingsConfigKV");
+	MarkNativeAsOptional("MC_RegisterPlugin");
+	MarkNativeAsOptional("MC_SetPluginCallBacks");
+	MarkNativeAsOptional("MC_StartItem");
+	MarkNativeAsOptional("MC_SetItemCallBacks");
+	MarkNativeAsOptional("MC_EndItem");
+	MarkNativeAsOptional("MC_EndPlugin");
+	MarkNativeAsOptional("MC_UnRegisterMe");
+	MarkNativeAsOptional("MC_IsValidPluginId");
+	MarkNativeAsOptional("MC_IsValidPluginUnique");
+	MarkNativeAsOptional("MC_GetClientActiveItem");
+	MarkNativeAsOptional("MC_GetClientSelectedItem");
+	MarkNativeAsOptional("MC_SetClientSelectedItem");
+}
+#endif
