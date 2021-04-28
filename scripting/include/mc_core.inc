@@ -63,6 +63,23 @@ typeset MC_OnMenuDisplayCallback
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 }
 
+typeset MC_OnMenuSelectedCallback
+{
+    /** 
+    *	Callback when selecting a plugin from the menu
+    *	
+    *	@param client           Player Index
+    *	@param plugin_unique    Plugin Id
+    *	@param plugin_id        Plugin index
+    *   @param core_type        Core type
+    *	@param buffer           The buffer where the result will be placed           
+    *	@param maxlen           Buffer size           
+    *	
+    *	@return true - continue the action, false - stop the action
+    */
+	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, MC_CoreTypeBits core_type);
+}
+
 /**
 *	Callback for menu item preview
 *	
@@ -129,10 +146,12 @@ native void MC_RegisterPlugin(char[] plugin_unique, MC_CoreTypeBits dont_load = 
  * Add plugin callbacks
  *	-
  * @param OnDisplay         Menu display callback
+ * @param OnSelect          Menu Select Callback
  *	-
  * @noreturn 
 */
-native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUNCTION);
+native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUNCTION,
+                                  MC_OnMenuSelectedCallback OnSelect = INVALID_FUNCTION);
 
 /*
  * Start item registration

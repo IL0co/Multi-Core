@@ -43,6 +43,24 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_unique, MC_C
     return result;
 }
 
+bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin_unique, MC_CoreTypeBits core_type)
+{
+    Function func = map.GetCallBack(PLUGIN_DATAPACKPOS_SELECTED);
+    bool result = true;
+
+    if(Check_IsValidFunctionCallBack(func, map.Plugin))
+    {
+        Call_StartFunction(map.Plugin, func);
+        Call_PushCell(client);
+        Call_PushString(plugin_unique);
+        Call_PushCell(GetPluginId(plugin_unique));
+        Call_PushCell(core_type);
+        Call_Finish(result);
+    }
+
+    return result;
+}
+
 // bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, char[] item_unique, StringMap map = null, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
 bool CallBack_OnItemDisplay(int client, const char[] plugin_unique, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
 {

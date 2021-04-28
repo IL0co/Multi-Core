@@ -69,6 +69,7 @@ public int Native_MC_SetPluginCallBacks(Handle plugin, int numParams)
 	
 	DataPack data = plugin_map.GetCallBacksPack();
 	data.WriteFunction(GetNativeFunction(1));
+	data.WriteFunction(GetNativeFunction(2));
 }
 
 public int Native_MC_StartItem(Handle plugin, int numParams)
@@ -112,6 +113,8 @@ public int Native_MC_SetItemCallBacks(Handle plugin, int numParams)
 
 	Function func = GetNativeFunction(2);
 	data.WriteFunction(func);
+
+	data.WriteFunction(GetNativeFunction(3));
 
 	if(!plugin_map.IsHavePreviewItem && func != INVALID_FUNCTION)
 		plugin_map.IsHavePreviewItem = true;

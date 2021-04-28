@@ -52,6 +52,9 @@ public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
 	if(!GetPluginMap(plugin_unique, map))
 		return false;
 
+	if(!CallBack_OnPluginSelected(client, map, plugin_unique, Core_VIP))
+		return true;
+
 	if(!map.IsHavePreviewItem)
 	{
 		if(GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]))
@@ -62,7 +65,6 @@ public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
 		{
 			char item_unique[MAX_UNIQUE_LENGTH];
 			VIP_GetClientFeatureString(client, plugin_unique, item_unique, sizeof(item_unique));
-			
 
 			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
