@@ -26,85 +26,85 @@ enum MC_PluginId
 
 enum MC_ValueOfCore
 {
-    All = 0,            // Public
-    VIP = 1,            // From VIP (by R1KO)
-    Shop = 2,           // From the shop (by FrozDark)
+    All = 0,                // Public
+    VIP = 1,                // From VIP (by R1KO)
+    Shop = 2,               // From the shop (by FrozDark)
 }
 
-typeset MC_OnMenuDisplayCallback
+typeset MC_OnMenuDisplayCallbacks
 {
-    /** 
-    *	Callback to display plugin name in menu
-    *	
-    *	@param client           Player Index
-    *	@param plugin_unique    Plugin Id
-    *	@param plugin_id        Plugin index
-    *   @param core_type        Core type
-    *	@param buffer           The buffer where the result will be placed           
-    *	@param maxlen           Buffer size           
-    *	
-    *	@return true - to display the new name or not change it, false - to hide
+    /* 
+     * Callback to display plugin name in menu
+     *  -
+     * @param client           Player Index
+     * @param plugin_unique    Plugin Id
+     * @param plugin_id        Plugin index
+     * @param core_type        Core type
+     * @param buffer           The buffer where the result will be placed           
+     * @param maxlen           Buffer size           
+     *  -
+     * @return true - to display the new name or not change it, false - to hide
     */
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 
-    /**
-    *	Callback to display item name in menu
-    *	
-    *	@param client           Player Index
-    *	@param plugin_unique    Plugin Id
-    *	@param plugin_id        Plugin index
-    *	@param item_unique      Item Id
-    *   @param core_type        Core type
-    *	@param buffer           The buffer where the result will be placed           
-    *	@param maxlen           Buffer size           
-    *	
-    *	@return true - to display the new name or not change it, false - to hide
+    /*
+     * Callback to display item name in menu
+     *  -
+     * @param client           Player Index
+     * @param plugin_unique    Plugin Id
+     * @param plugin_id        Plugin index
+     * @param item_unique      Item Id
+     * @param core_type        Core type
+     * @param buffer           The buffer where the result will be placed           
+     * @param maxlen           Buffer size           
+     *  -
+     * @return true - to display the new name or not change it, false - to hide
     */
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
 }
 
-typeset MC_OnMenuSelectedCallback
+typeset MC_OnMenuSelectedCallbacks
 {
-    /** 
-    *	Callback when selecting a plugin from the menu
-    *	
-    *	@param client           Player Index
-    *	@param plugin_unique    Plugin Id
-    *	@param plugin_id        Plugin index
-    *   @param core_type        Core type
-    *	@param buffer           The buffer where the result will be placed           
-    *	@param maxlen           Buffer size           
-    *	
-    *	@return true - continue the action, false - stop the action
+    /*
+     * Callback when selecting a plugin from the menu
+     *  -
+     * @param client           Player Index
+     * @param plugin_unique    Plugin Id
+     * @param plugin_id        Plugin index
+     * @param core_type        Core type
+     * @param buffer           The buffer where the result will be placed           
+     * @param maxlen           Buffer size           
+     *  -
+     * @return true - continue the action, false - stop the action
     */
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, MC_CoreTypeBits core_type);
 
-    /** 
-    *	Callback when selecting a item from the menu
-    *	
-    *	@param client           Player Index
-    *	@param plugin_unique    Plugin Id
-    *	@param plugin_id        Plugin index
-    *   @param core_type        Core type
-    *	@param item_unique      Item Id (can be empty if turned off)
-    *	@param buffer           The buffer where the result will be placed           
-    *	@param maxlen           Buffer size           
-    *	
-    *	@return true - continue the action, false - stop the action
+    /*
+     * Callback when selecting a item from the menu
+     *	-
+     * @param client           Player Index
+     * @param plugin_unique    Plugin Id
+     * @param plugin_id        Plugin index
+     * @param core_type        Core type
+     * @param item_unique      Item Id (can be empty if turned off)
+     * @param buffer           The buffer where the result will be placed           
+     * @param maxlen           Buffer size           
+     *	-
+     * @return true - continue the action, false - stop the action
     */
 	function bool (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type);
 }
 
-/**
-*	Callback for menu item preview
-*	
-*	@param client           Player Index
-*	@param plugin_unique    Plugin Id
-*	@param plugin_id        Plugin index
-*	@param item_unique      Item Id
-*   @param core_type        Core type
-*	
-*	@noreturn
+/*
+ * Callback for menu item preview
+ *  -
+ * @param client           Player Index
+ * @param plugin_unique    Plugin Id
+ * @param plugin_id        Plugin index
+ * @param item_unique      Item Id
+ * @param core_type        Core type
+ *	-
+ * @noreturn
 */
 typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_unique, MC_PluginId plugin_id, const char[] item_unique, MC_CoreTypeBits core_type);
 
@@ -165,8 +165,8 @@ native void MC_RegisterPlugin(char[] plugin_unique, MC_CoreTypeBits dont_load = 
  *	-
  * @noreturn 
 */
-native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUNCTION,
-                                  MC_OnMenuSelectedCallback OnSelect = INVALID_FUNCTION);
+native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallbacks OnDisplay = INVALID_FUNCTION,
+                                  MC_OnMenuSelectedCallbacks OnSelect = INVALID_FUNCTION);
 
 /*
  * Start item registration
@@ -186,9 +186,9 @@ native bool MC_StartItem(char[] item_unique);
  *	-
  * @noreturn 
 */
-native void MC_SetItemCallBacks(MC_OnMenuDisplayCallback OnDisplay = INVALID_FUNCTION,
+native void MC_SetItemCallBacks(MC_OnMenuDisplayCallbacks OnDisplay = INVALID_FUNCTION,
                                 MC_OnItemPreviewCallback OnPreview = INVALID_FUNCTION
-                                MC_OnMenuSelectedCallback OnSelect = INVALID_FUNCTION);
+                                MC_OnMenuSelectedCallbacks OnSelect = INVALID_FUNCTION);
 
 /*
  * Finish item registration
