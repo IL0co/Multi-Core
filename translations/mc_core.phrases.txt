@@ -1,0 +1,102 @@
+"Phrases"
+{
+	"ENABLED"
+	{
+		"ru"		" [Включено]"
+		"en"		" [Enabled]"
+	}
+
+	"DISABLED"
+	{
+		"ru"		" [Выключено]"
+		"en"		" [Disabled]"
+	}
+	
+	"SELECTED"
+	{
+		"ru"		" [Выбрано]"
+		"en"		" [Selected]"
+	}
+	
+	"PREVIEW MODE"
+	{
+		"ru"		"Превью режим"
+		"en"		"Preview mode"
+	}
+	
+	"DISABLE"
+	{
+		"ru"		"Выключить"
+		"en"		"Disable"
+	}
+	
+	"ERROR COMPLETE REGISTRATION PREVIOUSLY ITEM"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Сначала закончите регистрацию предыдущего предмета! '{1}'"
+		"en"		"Finish registering the previous item first! '{1}'"
+	}
+
+	"ERROR COMPLETE REGISTRATION PREVIOUSLY PLUGIN"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Сначала закончите регистрацию предыдущего плагина! '{1}'"
+		"en"		"Finish registering the previous plugin first! '{1}'"
+	}
+
+	"ERROR START THE REGISTERING PLUGIN"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Сначала начните регистрацию плагина!"
+		"en"		"First, start registering the plugin!"
+	}
+
+	"ERROR START THE REGISTERING ITEM"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Сначала начните регистрацию предмета!"
+		"en"		"First, start registering the item!"
+	}
+	
+	"ERROR PLUGIN IS ALREADY REGISTERED"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Плагин уже зарегистрирован! '{1}'"
+		"en"		"The plugin is already registered! '{1}'"
+	}
+	
+	"ERROR PLAYER LEAVE"
+	{
+		"#format"   	"{1:i}"
+		"ru"		"Игрок вышел! {1}"
+		"en"		"The player is out! {1}"
+	}
+	
+	"ERROR PLAYER IS BOT"
+	{
+		"#format"   	"{1:L}"
+		"ru"		"Этот игрок - бот! {1}"
+		"en"		"This player is a bot! {1}"
+	}
+	
+	"ERROR INVALID PLAYER"
+	{
+		"#format"   	"{1:L}"
+		"ru"		"Невалидный игрок! {1}"
+		"en"		"Invalid player! {1}"
+	}
+	
+	"ERROR INVALID PLUGIN INDEX"
+	{
+		"#format"   	"{1:i}"
+		"ru"		"Невалидный MC_PluginId %i"
+		"en"		"Invalid MC_PluginId %i"
+	}
+	
+	"ERROR FILE DOES NOT EXISTS"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Файла не существует! '{%s}'"
+		"en"		"File does not exist! '{%s}'"
+	}
+}	

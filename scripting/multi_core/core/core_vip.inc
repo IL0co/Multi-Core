@@ -37,7 +37,7 @@ public bool CallBack_VIP_OnItemDisplayed(int client, const char[] plugin_unique,
 
 		if(!map.IsHavePreviewItem)
 		{
-			Format(display, maxlength, "%s%s", display, GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]) ? " [Включено]" : " [Выключено]");
+			Format(display, maxlength, "%s%T", display, (GetPlayerSelectedItem(client, plugin_unique, g_hCookieKeys[VIP]) ? "ENABLED" : "DISABLED"), client);
 		}
 
 		return true;
@@ -62,6 +62,7 @@ public bool CallBack_VIP_OnItemSelected(int client, const char[] plugin_unique)
 		{
 			char item_unique[MAX_UNIQUE_LENGTH];
 			VIP_GetClientFeatureString(client, plugin_unique, item_unique, sizeof(item_unique));
+			
 
 			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[VIP], item_unique);
 		}
@@ -108,11 +109,16 @@ public Menu Menu_Vip_SelectItem(int client, const char[] plugin_unique)
 
 	if(plugin_map.IsHavePreviewItem)
 	{
-		Format(translate, sizeof(translate), "Превью режим %s", g_bPreviewMode[client] ? "[Включено]" : "[Выключено]");
+		Format(translate, sizeof(translate), "%T%T", "PREVIEW MODE", client, (g_bPreviewMode[client] ? "ENABLED" : "DISABLED"), client);
 		menu.AddItem("p", translate);
 	}
 
-	Format(translate, sizeof(translate), "Выключить %s\n ", selected_item[0] ? "" : "[Выбрано]");
+	if(selected_item[0])
+		Format(translate, sizeof(translate), "%T", "SELECTED", client);
+	else 
+		translate[0] = '\0';
+		
+	Format(translate, sizeof(translate), "%T%s\n ", "DISABLE", client, translate);
 	menu.AddItem("o", translate, (g_bPreviewMode[client] || !selected_item[0]) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 
 	VIP_GetClientFeatureString(client, plugin_unique, buff, sizeof(buff));
@@ -166,7 +172,7 @@ void Fill_MenuByItems(Menu menu, int client, bool selected, const char[] plugin_
 
 	if(!g_bPreviewMode[client] && selected)
 	{
-		Format(buff, sizeof(buff), "%s [Выбрано]", buff);
+		Format(buff, sizeof(buff), "%s%T", buff, "SELECTED", client);
 	}
 
 	menu.AddItem(item_unique, buff, (!g_bPreviewMode[client] && selected) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
