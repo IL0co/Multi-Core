@@ -228,6 +228,8 @@ public Action Command_Dump(int client, int args)
 			kv.GoBack();
 		}
 	}
+	
+	delete snap;
 
 	kv.Rewind();
 	kv.ExportToFile(path);
