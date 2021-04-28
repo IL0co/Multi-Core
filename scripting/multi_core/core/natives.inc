@@ -45,7 +45,7 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 	plugin_map.SetUnique(plugin_id);
 	plugin_map.Plugin = plugin;
 	plugin_map.DontLoadInCores = GetNativeCell(2);
-	plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Private);
+	plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Public);
 	
 	char buff[32];
 	FormatEx(buff, sizeof(buff), "%i", plugin);

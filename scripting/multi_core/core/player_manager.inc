@@ -90,16 +90,20 @@ void SavePlayerCookie(int client, char[] plugin_id)
     g_kvActiveClientList[client].Rewind();
     g_kvActiveClientList[client].JumpToKey(plugin_id);
 
+    MC_PluginMap map;
+    GetPluginMap(plugin_id, map);
+
     char buffer[256], item_unique[MAX_UNIQUE_LENGTH];
 
     for(int id; id < sizeof(g_hCookieKeys); id++)
     {
         g_kvActiveClientList[client].GetString(g_hCookieKeys[id], item_unique, sizeof(item_unique));
-        Format(buffer, sizeof(buffer), "%s|", item_unique);
+
+        if(id == 0)
+            Format(buffer, sizeof(buffer), "%s", item_unique);
+        else
+            Format(buffer, sizeof(buffer), "%s|%s", buffer, item_unique);
     }
-    
-    MC_PluginMap map;
-    GetPluginMap(plugin_id, map);
 
     map.Cookie.Set(client, buffer);
 }

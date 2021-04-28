@@ -122,13 +122,13 @@ public ShopAction CallBack_Shop_OnItemToggled(int client, CategoryId category_id
 	if(isOn || elapsed)
 	{
 		if(CallBack_OnItemSelected(client, plugin_map, item_map, plugin_id, "", Core_Shop))
-			SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], "");
+			SetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[Shop], "");
 			
 		return Shop_UseOff;
 	}
 		
 	if(CallBack_OnItemSelected(client, plugin_map, item_map, plugin_id, item_unique, Core_Shop))
-		SetPlayerSelectedItem(client, g_cLastSeePluginUnique[client], g_hCookieKeys[Shop], item_unique);
+		SetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[Shop], item_unique);
 
 	return Shop_UseOn;
 }
