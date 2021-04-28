@@ -1,4 +1,7 @@
-#include <sourcemod>
+#if defined _mc_core_included
+ #endinput
+#endif
+#define _mc_core_included
 
 #define MAX_UNIQUE_LENGTH   64      // Maximum length of identifier string
 
