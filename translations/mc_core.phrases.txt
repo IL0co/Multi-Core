@@ -100,6 +100,13 @@
 		"en"		"Invalid MC_PluginId %i"
 	}
 	
+	"ERROR INVALID PLUGIN UNIQUE"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Невалидный Plugin_Unique '%s'"
+		"en"		"Invalid Plugin_Unique '%s'"
+	}
+	
 	"ERROR FILE DOES NOT EXISTS"
 	{
 		"#format"   	"{1:s}"
