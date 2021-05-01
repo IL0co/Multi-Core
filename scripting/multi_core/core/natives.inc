@@ -14,6 +14,8 @@ public void LoadNatives()
 	CreateNative("MC_GetPluginIdsArrayList", Native_MC_GetPluginIdsArrayList);
 	CreateNative("MC_GetPluginItemsArrayList", Native_MC_GetPluginItemsArrayList);
 
+	CreateNative("MC_GetPluginDisplayName", Native_MC_GetPluginDisplayName);
+
 	CreateNative("MC_IsPluginHavePreviewItems", Native_MC_IsPluginHavePreviewItems);
 	CreateNative("MC_IsItemHavePreview", Native_MC_IsItemHavePreview);
 
@@ -247,6 +249,33 @@ public any Native_MC_GetPluginItemsArrayList(Handle plugin, int numParams)
 		return false;
 	
 	return map.GetItemsArray().Clone();
+}
+
+public any Native_MC_GetPluginDisplayName(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+
+	if(client >= MaxClients || client < 0)
+		Error(INVALID_CLIENT, client);
+
+	int plugin_index = GetNativeCell(2);
+	
+	if(!IsValidPluginId(plugin_index))					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
+
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_id, map))
+		return false;
+	
+	char name[128];
+	if(!CallBack_OnPluginUniqueDisplay(client, plugin_id, Core_MultiCore, name, sizeof(name)))
+		return false;
+
+	SetNativeString(3, name, GetNativeCell(4));
+	return true;
 }
 
 public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)

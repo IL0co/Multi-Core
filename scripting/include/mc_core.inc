@@ -322,6 +322,18 @@ native bool MC_IsValidPluginUnique(char[] plugin_id);
 native int MC_GetPluginsCountRegisteredByMe();
  
 /*
+ * Get the display name of the plugin
+ *	-
+ * @param client            Player Index
+ * @param plugin_index      Plugin index
+ * @param buffer            The buffer where the result will be placed           
+ * @param maxlen            Buffer size           
+ *	-
+ * @return true if all is well, false otherwise 
+*/
+native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, char[] buffer, int maxlen);
+ 
+/*
  * Getting an active item from a player
  *	-
  * @param client            Player Index
