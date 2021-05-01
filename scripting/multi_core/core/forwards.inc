@@ -2,13 +2,15 @@
 
 GlobalForward forward_OnCoreLoaded,
               forward_OnPluginRegistered,
-              forward_OnPluginUnRegistered_Pre;
+              forward_OnPluginUnRegistered_Pre,
+              forward_OnPluginUnRegistered;
 
 public void LoadForwards()
 {
 	forward_OnCoreLoaded = new GlobalForward("MC_OnCoreLoaded", ET_Ignore);
 	forward_OnPluginRegistered = new GlobalForward("MC_OnPluginRegistered", ET_Ignore, Param_String, Param_Cell);
 	forward_OnPluginUnRegistered_Pre = new GlobalForward("MC_OnPluginUnRegistered_Pre", ET_Ignore, Param_String, Param_Cell);
+	forward_OnPluginUnRegistered = new GlobalForward("MC_OnPluginUnRegistered", ET_Ignore, Param_String, Param_Cell);
 }
 
 void CallForward_OnCoreLoaded()
@@ -28,6 +30,14 @@ void CallForward_OnPluginRegistered(char[] plugin_id, int index)
 void CallForward_OnPluginUnRegistered_Pre(char[] plugin_id, int index)
 {
 	Call_StartForward(forward_OnPluginUnRegistered_Pre);
+    Call_PushString(plugin_id);
+    Call_PushCell(index);
+	Call_Finish();
+}
+
+void CallForward_OnPluginUnRegistered(char[] plugin_id, int index)
+{
+	Call_StartForward(forward_OnPluginUnRegistered);
     Call_PushString(plugin_id);
     Call_PushCell(index);
 	Call_Finish();

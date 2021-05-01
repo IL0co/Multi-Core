@@ -142,6 +142,16 @@ forward void MC_OnPluginRegistered(const char[] plugin_id, MC_PluginIndex plugin
 forward void MC_OnPluginUnRegistered_Pre(const char[] plugin_id, MC_PluginIndex plugin_index);
 
 /*
+ * Called after the plugin id was unregistered
+ *	-
+ * @param plugin_id         Plugin Id
+ * @param plugin_index      Plugin index
+ *	-
+ * @noreturn			
+*/
+forward void MC_OnPluginUnRegistered(const char[] plugin_id, MC_PluginIndex plugin_index);
+
+/*
  * Called after the core is loaded
  *	-
  * @noparams

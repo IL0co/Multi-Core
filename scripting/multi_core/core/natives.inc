@@ -200,6 +200,7 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		g_mapPlugins.Remove(plugin_id);
 		g_arPlugins.SetString(id, "");
 
+		CallForward_OnPluginUnRegistered(plugin_id, id);
 		
 		if(Check_IsCoreLoaded(Core_VIP) && VIP_IsValidFeature(plugin_id))
 		{
