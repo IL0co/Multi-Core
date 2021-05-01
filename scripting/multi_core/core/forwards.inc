@@ -57,7 +57,7 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, MC_CoreT
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginId(plugin_id));
+        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushCell(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
         Call_PushCell(maxlen);
@@ -80,7 +80,7 @@ bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginId(plugin_id));
+        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushCell(core_type);
         Call_Finish(result);
     }
@@ -103,7 +103,7 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] ite
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginId(plugin_id));
+        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
         Call_PushCell(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
@@ -130,7 +130,7 @@ void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] ite
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginId(plugin_id));
+        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
         Call_PushCell(core_type);
         Call_Finish();
@@ -147,7 +147,7 @@ bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap ite
         Call_StartFunction(plugin_map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginId(plugin_id));
+        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
         Call_PushCell(core_type);
         Call_Finish(result);

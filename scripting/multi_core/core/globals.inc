@@ -328,7 +328,7 @@ public bool GetPluginMap(const char[] plugin_id, MC_PluginMap &map)
 	return false;
 }
 
-public int GetPluginId(const char[] plugin_id)
+public int GetPluginIndex(const char[] plugin_id)
 {
 	return g_arPlugins.FindString(plugin_id);
 }
