@@ -1,15 +1,25 @@
 #include <sourcemod>
 
-GlobalForward forward_OnCoreLoaded;
+GlobalForward forward_OnCoreLoaded,
+              forward_OnPluginRegistered;
 
 public void LoadForwards()
 {
 	forward_OnCoreLoaded = new GlobalForward("MC_OnCoreLoaded", ET_Ignore);
+	forward_OnPluginRegistered = new GlobalForward("MC_OnPluginRegistered", ET_Ignore, Param_String, Param_Cell);
 }
 
 void CallForward_OnCoreLoaded()
 {
 	Call_StartForward(forward_OnCoreLoaded);
+	Call_Finish();
+}
+
+void CallForward_OnPluginRegistered(char[] plugin_id, int index)
+{
+	Call_StartForward(forward_OnPluginRegistered);
+    Call_PushString(plugin_id);
+    Call_PushCell(index);
 	Call_Finish();
 }
 

@@ -157,7 +157,11 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	delete plugin_map.DeathTimer;
 	plugin_map.DeathTimer = null;
 
-	return plugin_map.SaveGlobal();
+	int index = plugin_map.SaveGlobal();
+
+	CallForward_OnPluginRegistered(plugin_id, index);
+
+	return index;
 }
 
 public Action Timer_Delay_LoadInCores(Handle timer, DataPack data)

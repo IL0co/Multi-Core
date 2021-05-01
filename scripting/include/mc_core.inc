@@ -122,6 +122,16 @@ typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugi
 native int MC_PrecacheFile(char[] file, MC_DataType data_type);
 
 /*
+ * Called after the plugin id has been registered
+ *	-
+ * @param plugin_id         Plugin Id
+ * @param plugin_index      Plugin index
+ *	-
+ * @noreturn			
+*/
+forward void MC_OnPluginRegistered(const char[] plugin_id, MC_PluginIndex plugin_index);
+
+/*
  * Called after the core is loaded
  *	-
  * @noparams
