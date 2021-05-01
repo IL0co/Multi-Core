@@ -13,6 +13,8 @@ public void LoadNatives()
 
 	CreateNative("MC_GetPluginIdsArrayList", Native_MC_GetPluginIdsArrayList);
 
+	CreateNative("MC_IsPluginHavePreviewItems", Native_MC_IsPluginHavePreviewItems);
+
 	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 	CreateNative("MC_GetPluginsCountRegisteredByMe", Native_MC_GetPluginsCountRegisteredByMe);
@@ -224,6 +226,23 @@ public any Native_MC_GetPluginIdsArrayList(Handle plugin, int numParams)
 		ar.Erase(index);
 	
 	return ar;
+}
+
+public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
+{
+	int plugin_index = GetNativeCell(1);
+	
+	if(!IsValidPluginId(plugin_index))					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
+
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_id, map))
+		return false;
+
+	return map.IsHavePreviewItem;
 }
 
 public int Native_MC_IsValidPluginId(Handle plugin, int numParams)
