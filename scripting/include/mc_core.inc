@@ -286,6 +286,15 @@ native void MC_UnRegisterMe();
 native ArrayList MC_GetPluginIdsArrayList();
 
 /*
+ * Get an array of items. The handle must be closed!
+ *	-
+ * @param plugin_index         Plugin index
+ *	-
+ * @return ArrayList Handle      
+*/
+native ArrayList MC_GetPluginItemsArrayList(MC_PluginIndex plugin_index);
+
+/*
  * Check the validity of the plugin by its index
  *	-
  * @param plugin_index         Plugin index
