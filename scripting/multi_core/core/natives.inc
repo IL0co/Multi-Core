@@ -14,6 +14,7 @@ public void LoadNatives()
 	CreateNative("MC_GetPluginIdsArrayList", Native_MC_GetPluginIdsArrayList);
 
 	CreateNative("MC_IsPluginHavePreviewItems", Native_MC_IsPluginHavePreviewItems);
+	CreateNative("MC_IsItemHavePreview", Native_MC_IsItemHavePreview);
 
 	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
@@ -243,6 +244,28 @@ public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
 		return false;
 
 	return map.IsHavePreviewItem;
+}
+
+public any Native_MC_IsItemHavePreview(Handle plugin, int numParams)
+{
+	int plugin_index = GetNativeCell(1);
+	
+	if(!IsValidPluginId(plugin_index))					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
+
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_id, map))
+		return false;
+	
+	char item_id[MAX_UNIQUE_LENGTH];
+	GetNativeString(2, item_id, sizeof(item_id));
+
+	MC_ItemMap item_map = map.GetItemMap(item_id);
+
+	return (item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW) != INVALID_FUNCTION);
 }
 
 public int Native_MC_IsValidPluginId(Handle plugin, int numParams)

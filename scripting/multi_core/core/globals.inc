@@ -332,7 +332,7 @@ public int GetPluginIndex(const char[] plugin_id)
 {
 	return g_arPlugins.FindString(plugin_id);
 }
-
+ 
 public void GetPluginId(int plugin_index, char[] buffer, int maxlen)
 {
 	g_arPlugins.GetString(plugin_index, buffer, maxlen);

@@ -179,6 +179,16 @@ native bool MC_IsCoreLoaded(MC_CoreTypeBits core_type = Core_MultiCore);
 native bool MC_IsPluginHavePreviewItems(MC_PluginIndex plugin_index);
 
 /*
+ * Check if the item has a preview
+ *	-
+ * @param plugin_index      Plugin index
+ * @param item_unique       Item Id (unique)
+ *	-
+ * @return true if all is well, false otherwise 
+*/
+native bool MC_IsItemHavePreview(MC_PluginIndex plugin_index, char[] item_unique);
+
+/*
  * Get core config
  *	-
  * @param type              Core type
