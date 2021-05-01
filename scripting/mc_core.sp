@@ -20,23 +20,6 @@ public Plugin myinfo =
 	url			= "http://hlmod.ru"
 };
 
-
-/*	TODO:
-	- перейти с Cookie системы бд на SQL
-	- сделать рефакторинг кода
-	- добавить меню sm_mc
-	- если доступен только один предмет на выбор, то в VIP делать его как togglable
-	- поддерка персонального
-	- поддержка контроллера
-	- поддержка LR и FPS
-	- поддержка LK и LK2
-	- добавить форвард на регистрацию предмета в каком-то ядре (в процессе регистрации, что бы можно было дополнить своим)
-
-	FIXME:
-	- добавить описание предмета и "категории"
-	- добавить draw callbacks
-*/
-
 #include "multi_core/core/globals.inc"
 #include "multi_core/core/errors.inc"
 #include "multi_core/core/player_manager.inc"
