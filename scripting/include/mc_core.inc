@@ -189,6 +189,15 @@ native bool MC_IsPluginHavePreviewItems(MC_PluginIndex plugin_index);
 native bool MC_IsItemHavePreview(MC_PluginIndex plugin_index, char[] item_unique);
 
 /*
+ * Get plugin index by its id
+ *	-
+ * @param plugin_id         Plugin Id
+ *	-
+ * @return MC_PluginIndex index
+*/
+native MC_PluginIndex MC_GetPluginIndexFromId(char[] plugin_id);
+
+/*
  * Get core config
  *	-
  * @param type              Core type

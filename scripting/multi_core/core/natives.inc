@@ -16,6 +16,8 @@ public void LoadNatives()
 	CreateNative("MC_IsPluginHavePreviewItems", Native_MC_IsPluginHavePreviewItems);
 	CreateNative("MC_IsItemHavePreview", Native_MC_IsItemHavePreview);
 
+	CreateNative("MC_GetPluginIndexFromId", Native_GetPluginIndexFromId);
+
 	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 	CreateNative("MC_GetPluginsCountRegisteredByMe", Native_MC_GetPluginsCountRegisteredByMe);
@@ -266,6 +268,17 @@ public any Native_MC_IsItemHavePreview(Handle plugin, int numParams)
 	MC_ItemMap item_map = map.GetItemMap(item_id);
 
 	return (item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW) != INVALID_FUNCTION);
+}
+
+public any Native_GetPluginIndexFromId(Handle plugin, int numParams)
+{
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetNativeString(1, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))					
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
+	return GetPluginIndex(plugin_id);
 }
 
 public int Native_MC_IsValidPluginId(Handle plugin, int numParams)
