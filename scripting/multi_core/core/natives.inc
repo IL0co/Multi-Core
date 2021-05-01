@@ -11,6 +11,8 @@ public void LoadNatives()
 	CreateNative("MC_IsCoreLoaded", Native_MC_IsCoreLoaded);
 	CreateNative("MC_GetSettingsConfigKV", Native_MC_GetSettingsConfigKV);
 
+	CreateNative("MC_GetPluginIdsArrayList", Native_MC_GetPluginIdsArrayList);
+
 	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 	CreateNative("MC_GetPluginsCountRegisteredByMe", Native_MC_GetPluginsCountRegisteredByMe);
@@ -204,6 +206,17 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		Shop_UnregisterMe();		// FIXME: исправить костыль, сделать нормальную выгрузку с учётом наличия такого натива (Shop_UnregisterItem)
 		Shop_Started();
 	}
+}
+
+public any Native_MC_GetPluginIdsArrayList(Handle plugin, int numParams)
+{
+	ArrayList ar = g_arPlugins.Clone();
+	int index;
+
+	while((index = ar.FindString("")) >= 0)
+		ar.Erase(index);
+	
+	return ar;
 }
 
 public int Native_MC_IsValidPluginId(Handle plugin, int numParams)

@@ -221,6 +221,15 @@ native MC_PluginIndex MC_EndPlugin();
 native void MC_UnRegisterMe();
  
 /*
+ * Get an array of plugin ids. The handle must be closed!
+ *	-
+ * @noparams
+ *	-
+ * @return ArrayList Handle      
+*/
+native ArrayList MC_GetPluginIdsArrayList();
+
+/*
  * Check the validity of the plugin by its index
  *	-
  * @param plugin_index         Plugin index
@@ -329,6 +338,7 @@ public void __pl_mc_core_SetNTVOptional()
 	MarkNativeAsOptional("MC_EndItem");
 	MarkNativeAsOptional("MC_EndPlugin");
 	MarkNativeAsOptional("MC_UnRegisterMe");
+	MarkNativeAsOptional("Native_MC_GetPluginIdsArrayList");
 	MarkNativeAsOptional("MC_IsValidPluginIndex");
 	MarkNativeAsOptional("MC_IsValidPluginUnique");
 	MarkNativeAsOptional("MC_GetClientActiveItem");
