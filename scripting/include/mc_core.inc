@@ -338,13 +338,24 @@ native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, cha
  *	-
  * @param client            Player Index
  * @param plugin_index      Plugin index
- * @param item_unique       Item unique name (
+ * @param item_unique       Item unique name 
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
 native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, char[] item_unique, char[] buffer, int maxlen);
+ 
+/*
+ * Call a preview of the item for the player
+ *	-
+ * @param client            Player Index
+ * @param plugin_index      Plugin index
+ * @param item_unique       Item unique name 
+ *	-
+ * @noreturn
+*/
+native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, char[] item_unique);
  
 /*
  * Getting an active item from a player
