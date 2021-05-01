@@ -11,6 +11,7 @@ enum Errors
 	INVALID_CLIENT,
 	ERROR_INVALID_PLUGIN_ID,
 	ERROR_INVALID_PLUGIN_UNIQUE,
+	ERROR_INVALID_ITEM_UNIQUE,
 	FILE_NOT_EXIST,
 }
 
@@ -63,6 +64,10 @@ void Error(Errors error, any data = -1, char[] unique = "")
 	else if(error == ERROR_INVALID_PLUGIN_UNIQUE)
 	{
 		ThrowNativeError(4, "%T", "ERROR INVALID PLUGIN UNIQUE", 0, unique);
+	}
+	else if(error == ERROR_INVALID_ITEM_UNIQUE)
+	{
+		ThrowNativeError(4, "%T", "ERROR INVALID ITEM UNIQUE", 0, unique);
 	}
 	else if(error == FILE_NOT_EXIST)
 	{

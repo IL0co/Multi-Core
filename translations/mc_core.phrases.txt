@@ -107,6 +107,13 @@
 		"en"		"Invalid Plugin_Unique '%s'"
 	}
 	
+	"ERROR INVALID ITEM UNIQUE"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Невалидный Item_Unique '%s'"
+		"en"		"Invalid Item_Unique '%s'"
+	}
+	
 	"ERROR FILE DOES NOT EXISTS"
 	{
 		"#format"   	"{1:s}"
