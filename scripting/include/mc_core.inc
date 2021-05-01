@@ -195,7 +195,7 @@ native bool MC_IsItemHavePreview(MC_PluginIndex plugin_index, char[] item_unique
  *	-
  * @return MC_PluginIndex index
 */
-native MC_PluginIndex MC_GetPluginIndexFromId(char[] plugin_id);
+native MC_PluginIndex MC_GetPluginIndexFromId(const char[] plugin_id);
 
 /*
  * Get core config
@@ -310,7 +310,7 @@ native bool MC_IsValidPluginIndex(MC_PluginIndex plugin_index);
  *	-
  * @return true if all is well, false otherwise      
 */
-native bool MC_IsValidPluginUnique(char[] plugin_id);
+native bool MC_IsValidPluginUnique(const char[] plugin_id);
  
 /*
  * Get the number of plugins I have registered
@@ -344,7 +344,7 @@ native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, cha
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, char[] item_unique, char[] buffer, int maxlen);
+native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] buffer, int maxlen);
  
 /*
  * Call a preview of the item for the player
@@ -355,7 +355,7 @@ native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, char[
  *	-
  * @noreturn
 */
-native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, char[] item_unique);
+native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, const char[] item_unique);
  
 /*
  * Getting an active item from a player
