@@ -194,6 +194,8 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		if(map.Plugin != plugin)
 			continue;
 		
+		CallForward_OnPluginUnRegistered_Pre(plugin_id, id);
+
 		map.UnregisterMe();
 		g_mapPlugins.Remove(plugin_id);
 		g_arPlugins.SetString(id, "");
