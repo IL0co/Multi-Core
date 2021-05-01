@@ -112,17 +112,6 @@ typeset MC_OnMenuSelectedCallbacks
 typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type);
 
 /*
- * Called after the kernel is loaded
- *	-
- * @param core_name         Core name (id)
- * @param core_type         Core type
- * @param isLoaded          Is the core loaded
- *	-
- * @noreturn			
-*/
-forward void MC_OnCoreChangeStatus(char[] core_name, MC_CoreTypeBits core_type, bool isLoaded);
-
-/*
  * Precash file
  *	-
  * @param file              The path to the file. Particle name, etc.
@@ -131,6 +120,15 @@ forward void MC_OnCoreChangeStatus(char[] core_name, MC_CoreTypeBits core_type, 
  * @return file index or -1			
 */
 native int MC_PrecacheFile(char[] file, MC_DataType data_type);
+
+/*
+ * Called after the core is loaded
+ *	-
+ * @noparams
+ *	-
+ * @noreturn			
+*/
+forward void MC_OnCoreLoaded();
 
 /*
  * Core load check

@@ -220,7 +220,7 @@ public Action Command_Dump(int client, int args)
 
 public Action Timer_Delay_StartCore(Handle timer)
 {
-	CallForward_OnCoreChangeStatus("multicore", Core_MultiCore, true);
+	CallForward_OnCoreLoaded();
 }
 
 bool Check_IsCoreLoaded(MC_CoreTypeBits type)

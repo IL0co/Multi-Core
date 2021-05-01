@@ -1,18 +1,15 @@
 #include <sourcemod>
 
-GlobalForward forward_OnCoreChangeStatus;
+GlobalForward forward_OnCoreLoaded;
 
 public void LoadForwards()
 {
-	forward_OnCoreChangeStatus = new GlobalForward("MC_OnCoreChangeStatus", ET_Ignore, Param_String, Param_Cell, Param_Cell);
+	forward_OnCoreLoaded = new GlobalForward("MC_OnCoreLoaded", ET_Ignore);
 }
 
-void CallForward_OnCoreChangeStatus(const char[] core_name, MC_CoreTypeBits core_type, bool isLoaded)
+void CallForward_OnCoreLoaded()
 {
-	Call_StartForward(forward_OnCoreChangeStatus);
-	Call_PushString(core_name);
-	Call_PushCell(core_type);
-	Call_PushCell(isLoaded);
+	Call_StartForward(forward_OnCoreLoaded);
 	Call_Finish();
 }
 
