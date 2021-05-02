@@ -19,27 +19,24 @@ void CallForward_OnCoreLoaded()
 	Call_Finish();
 }
 
-void CallForward_OnPluginRegistered(char[] plugin_id, int index)
+void CallForward_OnPluginRegistered(char[] plugin_id)
 {
 	Call_StartForward(forward_OnPluginRegistered);
     Call_PushString(plugin_id);
-    Call_PushCell(index);
 	Call_Finish();
 }
 
-void CallForward_OnPluginUnRegistered_Pre(char[] plugin_id, int index)
+void CallForward_OnPluginUnRegistered_Pre(char[] plugin_id)
 {
 	Call_StartForward(forward_OnPluginUnRegistered_Pre);
     Call_PushString(plugin_id);
-    Call_PushCell(index);
 	Call_Finish();
 }
 
-void CallForward_OnPluginUnRegistered(char[] plugin_id, int index)
+void CallForward_OnPluginUnRegistered(char[] plugin_id)
 {
 	Call_StartForward(forward_OnPluginUnRegistered);
     Call_PushString(plugin_id);
-    Call_PushCell(index);
 	Call_Finish();
 }
 
@@ -57,7 +54,6 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, char[] c
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
         Call_PushCell(maxlen);
@@ -80,7 +76,6 @@ bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(core_type);
         Call_Finish(result);
     }
@@ -102,7 +97,6 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] ite
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
         Call_PushString(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
@@ -129,7 +123,6 @@ void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] ite
         Call_StartFunction(map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
         Call_PushString(core_type);
         Call_Finish();
@@ -146,7 +139,6 @@ bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap ite
         Call_StartFunction(plugin_map.Plugin, func);
         Call_PushCell(client);
         Call_PushString(plugin_id);
-        Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
         Call_PushString(core_type);
         Call_Finish(result);

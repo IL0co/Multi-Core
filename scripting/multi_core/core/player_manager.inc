@@ -136,7 +136,7 @@ void LoadPlayerCookies(int client)
             if(ar)
             {
                 ar.GetString(0, buffer, sizeof(buffer));
-                g_kvActiveClientList[client].SetString(g_hCookieKeys[All], buffer);
+                g_kvActiveClientList[client].SetString(g_hCookieKeys[0], buffer);
             }
         }
         else

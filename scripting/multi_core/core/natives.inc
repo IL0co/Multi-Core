@@ -23,9 +23,6 @@ public void LoadNatives()
 	CreateNative("MC_IsPluginHavePreviewItems", Native_MC_IsPluginHavePreviewItems);
 	CreateNative("MC_IsItemHavePreview", Native_MC_IsItemHavePreview);
 
-	CreateNative("MC_GetPluginIndexFromId", Native_GetPluginIndexFromId);
-
-	CreateNative("MC_IsValidPluginIndex", Native_MC_IsValidPluginId);
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 	CreateNative("MC_GetPluginsCountRegisteredByMe", Native_MC_GetPluginsCountRegisteredByMe);
 
@@ -164,10 +161,8 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	delete plugin_map.DeathTimer;
 	plugin_map.DeathTimer = null;
 
-	int index = plugin_map.SaveGlobal();
-	CallForward_OnPluginRegistered(plugin_id, index);
-
-	return index;
+	plugin_map.SaveGlobal();
+	CallForward_OnPluginRegistered(plugin_id);
 }
 
 public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
@@ -187,13 +182,13 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		if(map.Plugin != plugin)
 			continue;
 		
-		CallForward_OnPluginUnRegistered_Pre(plugin_id, id);
+		CallForward_OnPluginUnRegistered_Pre(plugin_id);
 
 		map.UnregisterMe();
 		g_mapPlugins.Remove(plugin_id);
 		g_arPlugins.SetString(id, "");
 
-		CallForward_OnPluginUnRegistered(plugin_id, id);
+		CallForward_OnPluginUnRegistered(plugin_id);
 	}
 }
 
@@ -210,14 +205,12 @@ public any Native_MC_GetPluginIdsArrayList(Handle plugin, int numParams)
 
 public any Native_MC_GetPluginItemsArrayList(Handle plugin, int numParams)
 {
-	int plugin_index = GetNativeCell(1);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(1, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return false;
@@ -232,14 +225,12 @@ public any Native_MC_GetPluginDisplayName(Handle plugin, int numParams)
 	if(client >= MaxClients || client < 0)
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return false;
@@ -262,14 +253,12 @@ public any Native_MC_GetItemDisplayName(Handle plugin, int numParams)
 	if(client >= MaxClients || client < 0)
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return false;
@@ -298,14 +287,12 @@ public any Native_MC_CallItemPreview(Handle plugin, int numParams)
 	if(client >= MaxClients || client < 0)
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
@@ -329,14 +316,12 @@ public any Native_MC_CallItemSelected(Handle plugin, int numParams)
 	if(client >= MaxClients || client < 0)
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return true;
@@ -362,14 +347,12 @@ public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
 	if(client >= MaxClients || client < 0)
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return true;
@@ -382,14 +365,12 @@ public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
 
 public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
 {
-	int plugin_index = GetNativeCell(1);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(1, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return false;
@@ -399,14 +380,12 @@ public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
 
 public any Native_MC_IsItemHavePreview(Handle plugin, int numParams)
 {
-	int plugin_index = GetNativeCell(1);
-	
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
-	
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
-
+	GetNativeString(1, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
 		return false;
@@ -417,25 +396,6 @@ public any Native_MC_IsItemHavePreview(Handle plugin, int numParams)
 	MC_ItemMap item_map = map.GetItemMap(item_id);
 
 	return (item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW) != INVALID_FUNCTION);
-}
-
-public any Native_GetPluginIndexFromId(Handle plugin, int numParams)
-{
-	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(1, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))					
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	return GetPluginIndex(plugin_id);
-}
-
-public int Native_MC_IsValidPluginId(Handle plugin, int numParams)
-{
-	if(IsValidPluginId(GetNativeCell(1)))
-		return true;
-	
-	return false;
 }
 
 public int Native_MC_IsValidPluginUnique(Handle plugin, int numParams)
@@ -537,13 +497,13 @@ public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
 	
-	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
+	char item_unique[MAX_UNIQUE_LENGTH];
 	
 	if(!GetPlayerActiveItem(client, plugin_id, item_unique, sizeof(item_unique)))
 		return false;
@@ -559,16 +519,16 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-
-	if(!IsValidPluginId(plugin_index))				
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
 
-	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
+	char item_unique[MAX_UNIQUE_LENGTH];
 	
 	if(!GetPlayerSelectedItem(client, plugin_id, core_type, item_unique, sizeof(item_unique)))
 		return false;
@@ -584,16 +544,17 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPlayer(client))
 		Error(INVALID_CLIENT, client);
 
-	int plugin_index = GetNativeCell(2);
-
-	if(!IsValidPluginId(plugin_index))					
-		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetNativeString(2, plugin_id, sizeof(plugin_id));
+	
+	if(!IsValidPluginUnique(plugin_id))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
 
-	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
-	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
+	char item_unique[MAX_UNIQUE_LENGTH];
+	GetNativeString(4, item_unique, sizeof(item_unique));
 	
 	SetPlayerSelectedItem(client, plugin_id, core_type, item_unique);
 }
@@ -624,26 +585,4 @@ void RemoveFromNowRegisteredMap(Handle plugin)
 
 	if(buff[0])
 		g_mapNowRegisteredPlugins.Remove(buff);
-}
-
-bool IsValidPluginId(int plugin_index)
-{
-	if(plugin_index == -1 || plugin_index >= g_arPlugins.Length)
-		return false;
-
-	char buff[1];
-	g_arPlugins.GetString(plugin_index, buff, sizeof(buff));
-
-	if(!buff[0])
-		return false;
-
-	return true;
-}
-
-bool GetPluginUniqueById(int plugin_index, char[] buffer, int maxlen)
-{
-	if(g_arPlugins.GetString(plugin_index, buffer, maxlen) == -1)
-		return false;
-
-	return true;
 }

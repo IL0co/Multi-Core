@@ -14,11 +14,6 @@ enum MC_DataType        // Data types
     Type_Sprite,            // Texture (.vmt)
 }
 
-enum MC_PluginIndex
-{
-    INVALID_PLUGIN_INDEX = -1,
-}
-
 typeset MC_OnMenuDisplayCallbacks
 {
     /* 
@@ -26,21 +21,19 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @param client           Player Index
      * @param plugin_id        Plugin Id
-     * @param plugin_index     Plugin index
      * @param core_type        Core type
      * @param buffer           The buffer where the result will be placed           
      * @param maxlen           Buffer size           
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, char[] core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
 
     /*
      * Callback to display item name in menu
      *  -
      * @param client           Player Index
      * @param plugin_id        Plugin Id
-     * @param plugin_index     Plugin index
      * @param item_unique      Item Id
      * @param core_type        Core type
      * @param buffer           The buffer where the result will be placed           
@@ -48,7 +41,7 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
 }
 
 typeset MC_OnMenuSelectedCallbacks
@@ -58,21 +51,19 @@ typeset MC_OnMenuSelectedCallbacks
      *  -
      * @param client           Player Index
      * @param plugin_id        Plugin Id
-     * @param plugin_index     Plugin index
      * @param core_type        Core type
      * @param buffer           The buffer where the result will be placed           
      * @param maxlen           Buffer size           
      *  -
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, char[] core_type);
+	function bool (int client, const char[] plugin_id, char[] core_type);
 
     /*
      * Callback when selecting a item from the menu
      *	-
      * @param client           Player Index
      * @param plugin_id        Plugin Id
-     * @param plugin_index     Plugin index
      * @param core_type        Core type
      * @param item_unique      Item Id (can be empty if turned off)
      * @param buffer           The buffer where the result will be placed           
@@ -80,7 +71,7 @@ typeset MC_OnMenuSelectedCallbacks
      *	-
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
+	function bool (int client, const char[] plugin_id, const char[] item_unique, char[] core_type);
 }
 
 /*
@@ -88,13 +79,12 @@ typeset MC_OnMenuSelectedCallbacks
  *  -
  * @param client            Player Index
  * @param plugin_id         Plugin Id
- * @param plugin_index      Plugin index
  * @param item_unique       Item Id
  * @param core_type         Core type
  *	-
  * @noreturn
 */
-typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
+typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, const char[] item_unique, char[] core_type);
 
 /*
  * Precash file
@@ -110,31 +100,28 @@ native int MC_PrecacheFile(char[] file, MC_DataType data_type);
  * Called after the plugin id has been registered
  *	-
  * @param plugin_id         Plugin Id
- * @param plugin_index      Plugin index
  *	-
  * @noreturn			
 */
-forward void MC_OnPluginRegistered(const char[] plugin_id, MC_PluginIndex plugin_index);
+forward void MC_OnPluginRegistered(const char[] plugin_id);
 
 /*
  * Called before the plugin id was unregistered
  *	-
  * @param plugin_id         Plugin Id
- * @param plugin_index      Plugin index
  *	-
  * @noreturn			
 */
-forward void MC_OnPluginUnRegistered_Pre(const char[] plugin_id, MC_PluginIndex plugin_index);
+forward void MC_OnPluginUnRegistered_Pre(const char[] plugin_id);
 
 /*
  * Called after the plugin id was unregistered
  *	-
  * @param plugin_id         Plugin Id
- * @param plugin_index      Plugin index
  *	-
  * @noreturn			
 */
-forward void MC_OnPluginUnRegistered(const char[] plugin_id, MC_PluginIndex plugin_index);
+forward void MC_OnPluginUnRegistered(const char[] plugin_id);
 
 /*
  * Called after the core is loaded
@@ -157,30 +144,21 @@ native bool MC_IsCoreLoaded();
 /*
  * Check for items with a preview in the plugin id
  *	-
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_IsPluginHavePreviewItems(MC_PluginIndex plugin_index);
+native bool MC_IsPluginHavePreviewItems(char[] plugin_id);
 
 /*
  * Check if the item has a preview
  *	-
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param item_unique       Item Id (unique)
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_IsItemHavePreview(MC_PluginIndex plugin_index, char[] item_unique);
-
-/*
- * Get plugin index by its id
- *	-
- * @param plugin_id         Plugin Id
- *	-
- * @return MC_PluginIndex index
-*/
-native MC_PluginIndex MC_GetPluginIndexFromId(const char[] plugin_id);
+native bool MC_IsItemHavePreview(char[] plugin_id, char[] item_unique);
 
 /*
  * Register Plugin Id
@@ -238,9 +216,9 @@ native void MC_EndItem();
  *	-
  * @noparams
  *	-
- * @return Plugin index 
+ * @noreturn 
 */
-native MC_PluginIndex MC_EndPlugin();
+native void MC_EndPlugin();
  
 /*
  * Unload plugin data (completely). Must be called in OnPluginEnd()
@@ -263,20 +241,11 @@ native ArrayList MC_GetPluginIdsArrayList();
 /*
  * Get an array of items. The handle must be closed!
  *	-
- * @param plugin_index         Plugin index
+ * @param plugin_id         Plugin Id
  *	-
  * @return ArrayList Handle      
 */
-native ArrayList MC_GetPluginItemsArrayList(MC_PluginIndex plugin_index);
-
-/*
- * Check the validity of the plugin by its index
- *	-
- * @param plugin_index         Plugin index
- *	-
- * @return true if all is well, false otherwise      
-*/
-native bool MC_IsValidPluginIndex(MC_PluginIndex plugin_index);
+native ArrayList MC_GetPluginItemsArrayList(char[] plugin_id);
 
 /*
  * Check the validity of the plugin by its identifier
@@ -300,32 +269,32 @@ native int MC_GetPluginsCountRegisteredByMe();
  * Get the display name of the plugin
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param core_type         Core type
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, char[] core_type, char[] buffer, int maxlen);
+native bool MC_GetPluginDisplayName(int client, char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
  
 /*
  * Call a select callback of the plugin for the player
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param item_unique       Item unique name 
  * @param core_type         Core type
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_CallPluginSelected(int client, MC_PluginIndex plugin_index, char[] core_type);
+native bool MC_CallPluginSelected(int client, char[] plugin_id, char[] core_type);
  
 /*
  * Get the display name of the item
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param item_unique       Item unique name 
  * @param core_type         Core type
  * @param buffer            The buffer where the result will be placed           
@@ -333,68 +302,68 @@ native bool MC_CallPluginSelected(int client, MC_PluginIndex plugin_index, char[
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
+native bool MC_GetItemDisplayName(int client, char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
  
 /*
  * Call a preview of the item for the player
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param item_unique       Item unique name 
  * @param core_type         Core type
  *	-
  * @noreturn
 */
-native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
+native void MC_CallItemPreview(int client, char[] plugin_id, const char[] item_unique, char[] core_type);
  
 /*
  * Call a select callback of the item for the player
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param item_unique       Item unique name 
  * @param core_type         Core type
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_CallItemSelected(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
+native bool MC_CallItemSelected(int client, char[] plugin_id, const char[] item_unique, char[] core_type);
  
 /*
  * Getting an active item from a player
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientActiveItem(int client, MC_PluginIndex plugin_index, char[] buffer, int maxlen);
+native bool MC_GetClientActiveItem(int client, char[] plugin_id, char[] buffer, int maxlen);
  
 /*
  * Getting an selected item from the player
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param core_type         Core type
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientSelectedItem(int client, MC_PluginIndex plugin_index, char[] core_type, char[] buffer, int maxlen);
+native bool MC_GetClientSelectedItem(int client, char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
  
 /*
  * Set the selected item to the player
  *	-
  * @param client            Player Index
- * @param plugin_index      Plugin index
+ * @param plugin_id         Plugin Id
  * @param core_type         Core type
  * @param item_unique       Item unique name (becomes active)
  *	-
  * @noreturn
 */
-native void MC_SetClientSelectedItem(int client, MC_PluginIndex plugin_index, char[] core_type, char[] item_unique);
+native void MC_SetClientSelectedItem(int client, char[] plugin_id, char[] core_type, char[] item_unique);
  
 /*
  * Get module config from folder 'addons/sourcemod/configs/multi-core/modules/'
@@ -435,8 +404,6 @@ public void __pl_mc_core_SetNTVOptional()
     
     MarkNativeAsOptional("MC_IsCoreLoaded");
 
-    MarkNativeAsOptional("MC_GetPluginIndexFromId");
-
     MarkNativeAsOptional("MC_RegisterPlugin");
     MarkNativeAsOptional("MC_SetPluginCallBacks");
     MarkNativeAsOptional("MC_StartItem");
@@ -448,7 +415,6 @@ public void __pl_mc_core_SetNTVOptional()
     MarkNativeAsOptional("MC_GetPluginIdsArrayList");
     MarkNativeAsOptional("MC_GetPluginItemsArrayList");
 
-    MarkNativeAsOptional("MC_IsValidPluginIndex");
     MarkNativeAsOptional("MC_IsValidPluginUnique");
 
     MarkNativeAsOptional("MC_GetPluginsCountRegisteredByMe");

@@ -127,8 +127,8 @@ public Action Command_Dump(int client, int args)
 
 		GetPluginInfo(mc_plugin.Plugin, PlInfo_Name, buff, sizeof(buff));
 		kv.SetString("Registered Plugin Name", buff);
+		kv.SetString("Plugin Unique", plugin_id);
 
-		kv.SetNum("MC_CategoryId", index);
 		kv.SetNum("Items Array", view_as<int>(ar));
 		kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
 		kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));

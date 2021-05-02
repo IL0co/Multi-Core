@@ -57,10 +57,6 @@ void Error(Errors error, any data = -1, char[] unique = "")
 			ThrowNativeError(4, "%T", "ERROR INVALID PLAYER", 0, data);
 
 	}
-	else if(error == ERROR_INVALID_PLUGIN_ID)
-	{
-		ThrowNativeError(4, "%T", "ERROR INVALID PLUGIN INDEX", 0, data);
-	}
 	else if(error == ERROR_INVALID_PLUGIN_UNIQUE)
 	{
 		ThrowNativeError(4, "%T", "ERROR INVALID PLUGIN UNIQUE", 0, unique);

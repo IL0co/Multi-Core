@@ -114,13 +114,13 @@ methodmap MC_PluginMap < StringMap
 		return map;
 	}
 
-	public int SaveGlobal()
+	public void SaveGlobal()
 	{
 		char plugin_id[MAX_UNIQUE_LENGTH];
 		this.GetUnique(plugin_id, sizeof(plugin_id));
 
 		g_mapPlugins.SetValue(plugin_id, this, true);
-		return g_arPlugins.PushString(plugin_id);
+		g_arPlugins.PushString(plugin_id);
 	}
 
 	public void SaveItem(MC_ItemMap item_map, char[] item_unique)
@@ -306,14 +306,4 @@ public bool GetPluginMap(const char[] plugin_id, MC_PluginMap &map)
 		return true;
 
 	return false;
-}
-
-public int GetPluginIndex(const char[] plugin_id)
-{
-	return g_arPlugins.FindString(plugin_id);
-}
- 
-public void GetPluginId(int plugin_index, char[] buffer, int maxlen)
-{
-	g_arPlugins.GetString(plugin_index, buffer, maxlen);
 }
