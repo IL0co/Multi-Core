@@ -334,6 +334,17 @@ native int MC_GetPluginsCountRegisteredByMe();
 native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, char[] buffer, int maxlen);
  
 /*
+ * Call a select callback of the plugin for the player
+ *	-
+ * @param client            Player Index
+ * @param plugin_index      Plugin index
+ * @param item_unique       Item unique name 
+ *	-
+ * @return true if given permission, false otherwise
+*/
+native bool MC_CallPluginSelected(int client, MC_PluginIndex plugin_index);
+ 
+/*
  * Get the display name of the item
  *	-
  * @param client            Player Index

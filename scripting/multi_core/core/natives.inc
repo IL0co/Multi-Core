@@ -19,6 +19,7 @@ public void LoadNatives()
 
 	CreateNative("MC_CallItemPreview", Native_MC_CallItemPreview);
 	CreateNative("MC_CallItemSelected", Native_MC_CallItemSelected);
+	CreateNative("MC_CallPluginSelected", Native_MC_CallPluginSelected);
 
 	CreateNative("MC_IsPluginHavePreviewItems", Native_MC_IsPluginHavePreviewItems);
 	CreateNative("MC_IsItemHavePreview", Native_MC_IsItemHavePreview);
@@ -373,6 +374,28 @@ public any Native_MC_CallItemSelected(Handle plugin, int numParams)
 	MC_ItemMap item_map = map.GetItemMap(item_id);
 
 	return CallBack_OnItemSelected(client, map, item_map, plugin_id, item_id, Core_MultiCore);
+}
+
+public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+
+	if(client >= MaxClients || client < 0)
+		Error(INVALID_CLIENT, client);
+
+	int plugin_index = GetNativeCell(2);
+	
+	if(!IsValidPluginId(plugin_index))					
+		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
+	
+	char plugin_id[MAX_UNIQUE_LENGTH];
+	GetPluginId(plugin_index, plugin_id, sizeof(plugin_id));
+
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_id, map))
+		return true;
+	
+	return CallBack_OnPluginSelected(client, map, plugin_id, Core_MultiCore);
 }
 
 public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
