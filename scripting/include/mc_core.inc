@@ -5,14 +5,6 @@
 
 #define MAX_UNIQUE_LENGTH   64      // Maximum length of identifier string
 
-enum MC_CoreTypeBits    // Core types
-{                           //                                  | Core (library) identifier:
-    Core_Unloaded = 0,      // None of the cores are loaded     |
-    Core_MultiCore = 1,     // Core Multi-Core                  | multicore
-    Core_Shop = 2,          // Shop Core                        | shop
-    Core_VIP = 4,           // VIP Core                         | vip_core
-}
-
 enum MC_DataType        // Data types
 {   
     Type_Model = 0,         // Model (.mdl)
@@ -48,7 +40,7 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, char[] core_type, char[] buffer, int maxlen);
 
     /*
      * Callback to display item name in menu
@@ -63,7 +55,7 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
 }
 
 typeset MC_OnMenuSelectedCallbacks
@@ -80,7 +72,7 @@ typeset MC_OnMenuSelectedCallbacks
      *  -
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, MC_CoreTypeBits core_type);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, char[] core_type);
 
     /*
      * Callback when selecting a item from the menu
@@ -95,7 +87,7 @@ typeset MC_OnMenuSelectedCallbacks
      *	-
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type);
+	function bool (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
 }
 
 /*
@@ -109,7 +101,7 @@ typeset MC_OnMenuSelectedCallbacks
  *	-
  * @noreturn
 */
-typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, MC_CoreTypeBits core_type);
+typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
 
 /*
  * Precash file
@@ -163,11 +155,11 @@ forward void MC_OnCoreLoaded();
 /*
  * Core load check
  *	-
- * @param core_type         Core type
+ * @noparams
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_IsCoreLoaded(MC_CoreTypeBits core_type = Core_MultiCore);
+native bool MC_IsCoreLoaded();
 
 /*
  * Check for items with a preview in the plugin id
@@ -210,11 +202,10 @@ native KeyValues MC_GetSettingsConfigKV(MC_ValueOfCore type);
  * Register Plugin Id
  *	-
  * @param plugin_id         Plugin Id
- * @param dont_load         Bits indexes of cores, which do not register this Plugin Id
  *	-
  * @noreturn   
 */
-native void MC_RegisterPlugin(char[] plugin_id, MC_CoreTypeBits dont_load = Core_Unloaded);
+native void MC_RegisterPlugin(char[] plugin_id);
  
 /*
  * Add plugin callbacks
@@ -326,12 +317,13 @@ native int MC_GetPluginsCountRegisteredByMe();
  *	-
  * @param client            Player Index
  * @param plugin_index      Plugin index
+ * @param core_type         Core type
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, char[] buffer, int maxlen);
+native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, char[] core_type, char[] buffer, int maxlen);
  
 /*
  * Call a select callback of the plugin for the player
@@ -339,10 +331,11 @@ native bool MC_GetPluginDisplayName(int client, MC_PluginIndex plugin_index, cha
  * @param client            Player Index
  * @param plugin_index      Plugin index
  * @param item_unique       Item unique name 
+ * @param core_type         Core type
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_CallPluginSelected(int client, MC_PluginIndex plugin_index);
+native bool MC_CallPluginSelected(int client, MC_PluginIndex plugin_index, char[] core_type);
  
 /*
  * Get the display name of the item
@@ -350,12 +343,13 @@ native bool MC_CallPluginSelected(int client, MC_PluginIndex plugin_index);
  * @param client            Player Index
  * @param plugin_index      Plugin index
  * @param item_unique       Item unique name 
+ * @param core_type         Core type
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] buffer, int maxlen);
+native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
  
 /*
  * Call a preview of the item for the player
@@ -363,10 +357,11 @@ native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, const
  * @param client            Player Index
  * @param plugin_index      Plugin index
  * @param item_unique       Item unique name 
+ * @param core_type         Core type
  *	-
  * @noreturn
 */
-native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, const char[] item_unique);
+native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
  
 /*
  * Call a select callback of the item for the player
@@ -374,10 +369,11 @@ native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, const ch
  * @param client            Player Index
  * @param plugin_index      Plugin index
  * @param item_unique       Item unique name 
+ * @param core_type         Core type
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_CallItemSelected(int client, MC_PluginIndex plugin_index, const char[] item_unique);
+native bool MC_CallItemSelected(int client, MC_PluginIndex plugin_index, const char[] item_unique, char[] core_type);
  
 /*
  * Getting an active item from a player

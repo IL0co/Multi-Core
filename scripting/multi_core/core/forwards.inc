@@ -43,7 +43,7 @@ void CallForward_OnPluginUnRegistered(char[] plugin_id, int index)
 	Call_Finish();
 }
 
-bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
+bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, char[] core_type, char[] buffer, int maxlen)
 {
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
@@ -58,7 +58,7 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, MC_CoreT
         Call_PushCell(client);
         Call_PushString(plugin_id);
         Call_PushCell(GetPluginIndex(plugin_id));
-        Call_PushCell(core_type);
+        Call_PushString(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
         Call_PushCell(maxlen);
         Call_Finish(result);
@@ -70,7 +70,7 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, MC_CoreT
     return result;
 }
 
-bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin_id, MC_CoreTypeBits core_type)
+bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin_id, char[] core_type)
 {
     Function func = map.GetCallBack(PLUGIN_DATAPACKPOS_SELECTED);
     bool result = true;
@@ -81,15 +81,14 @@ bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin
         Call_PushCell(client);
         Call_PushString(plugin_id);
         Call_PushCell(GetPluginIndex(plugin_id));
-        Call_PushCell(core_type);
+        Call_PushString(core_type);
         Call_Finish(result);
     }
 
     return result;
 }
 
-// bool CallBack_OnItemDisplay(int client, const char[] plugin_id, char[] item_unique, StringMap map = null, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
-bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] item_unique, MC_CoreTypeBits core_type, char[] buffer, int maxlen)
+bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen)
 {
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
@@ -105,7 +104,7 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] ite
         Call_PushString(plugin_id);
         Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
-        Call_PushCell(core_type);
+        Call_PushString(core_type);
         Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
         Call_PushCell(maxlen);
         Call_Finish(result);
@@ -117,7 +116,7 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] ite
     return result;
 }
 
-void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] item_unique, MC_CoreTypeBits core_type)
+void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] item_unique, char[] core_type)
 {
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
@@ -132,12 +131,12 @@ void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] ite
         Call_PushString(plugin_id);
         Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
-        Call_PushCell(core_type);
+        Call_PushString(core_type);
         Call_Finish();
     }
 }
 
-bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap item_map, const char[] plugin_id, const char[] item_unique, MC_CoreTypeBits core_type)
+bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap item_map, const char[] plugin_id, const char[] item_unique, char[] core_type)
 {
     Function func = item_map.GetCallBack(ITEM_DATAPACKPOS_SELECTED);
     bool result = true;
@@ -149,7 +148,7 @@ bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap ite
         Call_PushString(plugin_id);
         Call_PushCell(GetPluginIndex(plugin_id));
         Call_PushString(item_unique);
-        Call_PushCell(core_type);
+        Call_PushString(core_type);
         Call_Finish(result);
     }
 

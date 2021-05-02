@@ -25,8 +25,6 @@ public Plugin myinfo =
 #include "multi_core/core/player_manager.inc"
 #include "multi_core/core/natives.inc"
 #include "multi_core/core/forwards.inc"
-#include "multi_core/core/core_vip.inc"
-#include "multi_core/core/core_shop.inc"
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {	
@@ -42,45 +40,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 	RegPluginLibrary("multicore");
 	return APLRes_Success;
-}
-
-public void OnLibraryAdded(const char[] name)
-{
-	Check_IsLoadLibraryName(name, true);
-}
-
-public void OnLibraryRemoved(const char[] name)
-{
-	Check_IsLoadLibraryName(name, false);
-}
-
-void Check_IsLoadLibraryName(const char[] name, bool isLoad)
-{
-	for(int id; id < sizeof(g_LoadCoreType); id++)		
-	{
-		if(strcmp(name, g_LoadCoreType[id], false) != 0)
-			continue;
-
-		if(isLoad)
-			g_IsCoreLoadBits |= g_LoadCoreBits[id];
-		else
-			g_IsCoreLoadBits &= ~g_LoadCoreBits[id];
-
-		CallForward_OnCoreChangeStatus(name, g_LoadCoreBits[id], isLoad);
-
-		break;
-	}
-}
-
-public void OnPluginEnd()
-{
-	if(Check_IsCoreLoaded(Core_Shop))
-		Shop_UnregisterMe();
-
-	if(Check_IsCoreLoaded(Core_VIP))
-		VIP_UnregisterMe();
-
-	MC_UnRegisterMe();
 }
 
 public void OnPluginStart()
@@ -154,16 +113,10 @@ public void OnPluginStart()
 
 	delete kv;
 
-	if(!(g_IsCoreLoadBits & Core_MultiCore))
-		CreateTimer(0.1, Timer_Delay_StartCore);
-
-	g_IsCoreLoadBits = Core_MultiCore;
-
-	for(int id; id < sizeof(g_LoadCoreType); id++)		if(LibraryExists(g_LoadCoreType[id]))
-		g_IsCoreLoadBits |= g_LoadCoreBits[id];
-
 	RegAdminCmd("sm_mc_dump", Command_Dump, ADMFLAG_ROOT);
 	LoadTranslations("mc_core.phrases");
+
+	g_bIsCoreLoaded = true;
 }
 
 public Action Command_Dump(int client, int args)
@@ -221,12 +174,4 @@ public Action Command_Dump(int client, int args)
 public Action Timer_Delay_StartCore(Handle timer)
 {
 	CallForward_OnCoreLoaded();
-}
-
-bool Check_IsCoreLoaded(MC_CoreTypeBits type)
-{
-	if(g_IsCoreLoadBits & type)
-		return true;
-
-	return false;
 }

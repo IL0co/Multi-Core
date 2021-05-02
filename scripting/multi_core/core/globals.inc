@@ -1,8 +1,6 @@
 #include <sourcemod>
 
-char g_LoadCoreType[][] = 		   {"shop",    "vip_core"};
-MC_CoreTypeBits g_LoadCoreBits[] = {Core_Shop, Core_VIP};
-MC_CoreTypeBits g_IsCoreLoadBits;
+bool g_bIsCoreLoaded;
 
 char g_hCookieKeys[][] = {"all", "vip", "shop"};
 char g_hFileHeads[][] = {"MC Give To All", "", "Shop Config"};		// Заголовки конфиг файлов
@@ -247,21 +245,6 @@ methodmap MC_PluginMap < StringMap
 		public set(bool state)
 		{
 			this.SetValue("Have Preview Item", state, true);
-		}
-	}
-
-	property MC_CoreTypeBits DontLoadInCores
-	{
-		public get()
-		{
-			MC_CoreTypeBits bits;
-			this.GetValue("Dont Load In Cores", bits);
-
-			return bits;
-		}
-		public set(MC_CoreTypeBits bits)
-		{
-			this.SetValue("Dont Load In Cores", bits, true);
 		}
 	}
 

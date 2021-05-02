@@ -59,7 +59,6 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 	plugin_map = new MC_PluginMap();
 	plugin_map.SetUnique(plugin_id);
 	plugin_map.Plugin = plugin;
-	plugin_map.DontLoadInCores = GetNativeCell(2);
 	plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Public);
 	
 	char buff[32];
@@ -162,32 +161,14 @@ public int Native_MC_EndPlugin(Handle plugin, int numParams)
 	char plugin_id[MAX_UNIQUE_LENGTH];
 	plugin_map.GetUnique(plugin_id, sizeof(plugin_id));
 
-	DataPack data = new DataPack();
-	data.WriteString(plugin_id);
-	CreateTimer(1.0, Timer_Delay_LoadInCores, data, TIMER_HNDL_CLOSE);
-
 	RemoveFromNowRegisteredMap(plugin);
 	delete plugin_map.DeathTimer;
 	plugin_map.DeathTimer = null;
 
 	int index = plugin_map.SaveGlobal();
-
 	CallForward_OnPluginRegistered(plugin_id, index);
 
 	return index;
-}
-
-public Action Timer_Delay_LoadInCores(Handle timer, DataPack data)
-{
-	data.Reset();
-
-	char plugin_id[MAX_UNIQUE_LENGTH];
-	data.ReadString(plugin_id, sizeof(plugin_id));
-
-	Load_Vip(plugin_id);
-	Load_Shop(plugin_id);
-
-	return Plugin_Stop;
 }
 
 public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
@@ -214,17 +195,6 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		g_arPlugins.SetString(id, "");
 
 		CallForward_OnPluginUnRegistered(plugin_id, id);
-		
-		if(Check_IsCoreLoaded(Core_VIP) && VIP_IsValidFeature(plugin_id))
-		{
-			VIP_UnregisterFeature(plugin_id);
-		}
-	}
-
-	if(Check_IsCoreLoaded(Core_Shop))
-	{
-		Shop_UnregisterMe();		// FIXME: исправить костыль, сделать нормальную выгрузку с учётом наличия такого натива (Shop_UnregisterItem)
-		Shop_Started();
 	}
 }
 
@@ -275,11 +245,14 @@ public any Native_MC_GetPluginDisplayName(Handle plugin, int numParams)
 	if(!GetPluginMap(plugin_id, map))
 		return false;
 	
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(3, core_type, sizeof(core_type));
+
 	char name[128];
-	if(!CallBack_OnPluginUniqueDisplay(client, plugin_id, Core_MultiCore, name, sizeof(name)))
+	if(!CallBack_OnPluginUniqueDisplay(client, plugin_id, core_type, name, sizeof(name)))
 		return false;
 
-	SetNativeString(3, name, GetNativeCell(4));
+	SetNativeString(4, name, GetNativeCell(5));
 	return true;
 }
 
@@ -308,13 +281,14 @@ public any Native_MC_GetItemDisplayName(Handle plugin, int numParams)
 	if(!map.IsValidItem(item_id))
 		Error(ERROR_INVALID_ITEM_UNIQUE, _, item_id);
 
-	MC_ItemMap item_map = map.GetItemMap(item_id);
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(4, core_type, sizeof(core_type));
 
 	char name[128];
-	if(!CallBack_OnItemDisplay(client, plugin_id, item_id, Core_MultiCore, name, sizeof(name)))
+	if(!CallBack_OnItemDisplay(client, plugin_id, item_id, core_type, name, sizeof(name)))
 		return false;
 
-	SetNativeString(4, name, GetNativeCell(5));
+	SetNativeString(5, name, GetNativeCell(6));
 	return true;
 }
 
@@ -335,7 +309,7 @@ public any Native_MC_CallItemPreview(Handle plugin, int numParams)
 
 	MC_PluginMap map;
 	if(!GetPluginMap(plugin_id, map))
-		return false;
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
 	
 	char item_id[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, item_id, sizeof(item_id));
@@ -343,7 +317,10 @@ public any Native_MC_CallItemPreview(Handle plugin, int numParams)
 	if(!map.IsValidItem(item_id))
 		Error(ERROR_INVALID_ITEM_UNIQUE, _, item_id);
 
-	CallBack_OnItemPreview(client, plugin_id, item_id, Core_MultiCore);
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(4, core_type, sizeof(core_type));
+
+	CallBack_OnItemPreview(client, plugin_id, item_id, core_type);
 }
 
 public any Native_MC_CallItemSelected(Handle plugin, int numParams)
@@ -373,7 +350,10 @@ public any Native_MC_CallItemSelected(Handle plugin, int numParams)
 
 	MC_ItemMap item_map = map.GetItemMap(item_id);
 
-	return CallBack_OnItemSelected(client, map, item_map, plugin_id, item_id, Core_MultiCore);
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(4, core_type, sizeof(core_type));
+
+	return CallBack_OnItemSelected(client, map, item_map, plugin_id, item_id, core_type);
 }
 
 public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
@@ -395,7 +375,10 @@ public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
 	if(!GetPluginMap(plugin_id, map))
 		return true;
 	
-	return CallBack_OnPluginSelected(client, map, plugin_id, Core_MultiCore);
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(3, core_type, sizeof(core_type));
+
+	return CallBack_OnPluginSelected(client, map, plugin_id, core_type);
 }
 
 public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
@@ -545,7 +528,7 @@ public int Native_MC_PrecacheFile(Handle plugin, int numParams)
 
 public int Native_MC_IsCoreLoaded(Handle plugin, int numParams)
 {
-	return Check_IsCoreLoaded(GetNativeCell(1));
+	return g_bIsCoreLoaded;
 }
 
 public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
