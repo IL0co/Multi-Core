@@ -564,11 +564,13 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPluginId(plugin_index))				
 		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
 	
-	int core_type = GetNativeCell(3);
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(3, core_type, sizeof(core_type));
+
 	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
 	
-	if(!GetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[core_type], item_unique, sizeof(item_unique)))
+	if(!GetPlayerSelectedItem(client, plugin_id, core_type, item_unique, sizeof(item_unique)))
 		return false;
 
 	SetNativeString(4, item_unique, GetNativeCell(5));
@@ -587,11 +589,13 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	if(!IsValidPluginId(plugin_index))					
 		Error(ERROR_INVALID_PLUGIN_ID, plugin_index);
 	
-	int core_type = GetNativeCell(3);
+	char core_type[MAX_UNIQUE_LENGTH];
+	GetNativeString(3, core_type, sizeof(core_type));
+
 	char plugin_id[MAX_UNIQUE_LENGTH], item_unique[MAX_UNIQUE_LENGTH];
 	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
 	
-	SetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[core_type], item_unique);
+	SetPlayerSelectedItem(client, plugin_id, core_type, item_unique);
 }
 
 bool IsValidPluginUnique(char[] plugin_id)

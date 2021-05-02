@@ -4,10 +4,6 @@
 #include <mc_core>
 #include <clientprefs>
 
-#undef REQUIRE_PLUGIN
-#tryinclude <shop>
-#tryinclude <vip_core>
-
 #pragma newdecls required
 #pragma semicolon 1
 
@@ -28,13 +24,6 @@ public Plugin myinfo =
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {	
-	__pl_shop_SetNTVOptional();
-	__pl_vip_core_SetNTVOptional();
-
-	MarkNativeAsOptional("VIP_UnregisterMe");
-	MarkNativeAsOptional("Shop_SetHide");
-	// MarkNativeAsOptional("Shop_UnregisterItem");
-
 	LoadForwards();
 	LoadNatives();
 
@@ -47,10 +36,10 @@ public void OnPluginStart()
 	ArrayList ar;
 	char exp[32][MAX_UNIQUE_LENGTH], plugin_id[MAX_UNIQUE_LENGTH], buff[256];
 	
-	BuildPath(Path_SM, g_hFilePaths[All], sizeof(g_hFilePaths[]), "configs/multi-core/settings_to_all.cfg");	//FIXME: добавить варны что идентификатора повторяются
+	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_to_all.cfg");	//FIXME: добавить варны что идентификатора повторяются
 	g_kvItemsToAll = new KeyValues("MC Give To All");
-	if(!g_kvItemsToAll.ImportFromFile(g_hFilePaths[All]))
-		Error(FILE_NOT_EXIST, _, g_hFilePaths[All]);
+	if(!g_kvItemsToAll.ImportFromFile(buff))
+		Error(FILE_NOT_EXIST, _, buff);
 	
 	if(g_kvItemsToAll.GotoFirstSubKey(false))
 	{

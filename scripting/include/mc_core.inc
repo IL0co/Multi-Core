@@ -19,13 +19,6 @@ enum MC_PluginIndex
     INVALID_PLUGIN_INDEX = -1,
 }
 
-enum MC_ValueOfCore
-{
-    All = 0,                // Public
-    VIP = 1,                // From VIP (by R1KO)
-    Shop = 2,               // From the shop (by FrozDark)
-}
-
 typeset MC_OnMenuDisplayCallbacks
 {
     /* 
@@ -383,25 +376,25 @@ native bool MC_GetClientActiveItem(int client, MC_PluginIndex plugin_index, char
  *	-
  * @param client            Player Index
  * @param plugin_index      Plugin index
- * @param type              Core type
+ * @param core_type         Core type
  * @param buffer            The buffer where the result will be placed           
  * @param maxlen            Buffer size           
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientSelectedItem(int client, MC_PluginIndex plugin_index, MC_ValueOfCore type, char[] buffer, int maxlen);
+native bool MC_GetClientSelectedItem(int client, MC_PluginIndex plugin_index, char[] core_type, char[] buffer, int maxlen);
  
 /*
  * Set the selected item to the player
  *	-
  * @param client            Player Index
  * @param plugin_index      Plugin index
- * @param type              Core type
+ * @param core_type         Core type
  * @param item_unique       Item unique name (becomes active)
  *	-
  * @noreturn
 */
-native void MC_SetClientSelectedItem(int client, MC_PluginIndex plugin_index, MC_ValueOfCore type, char[] item_unique);
+native void MC_SetClientSelectedItem(int client, MC_PluginIndex plugin_index, char[] core_type, char[] item_unique);
  
 /*
  * Get module config from folder 'addons/sourcemod/configs/multi-core/modules/'
