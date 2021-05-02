@@ -358,6 +358,17 @@ native bool MC_GetItemDisplayName(int client, MC_PluginIndex plugin_index, const
 native void MC_CallItemPreview(int client, MC_PluginIndex plugin_index, const char[] item_unique);
  
 /*
+ * Call a select callback of the item for the player
+ *	-
+ * @param client            Player Index
+ * @param plugin_index      Plugin index
+ * @param item_unique       Item unique name 
+ *	-
+ * @return true if given permission, false otherwise
+*/
+native bool MC_CallItemSelected(int client, MC_PluginIndex plugin_index, const char[] item_unique);
+ 
+/*
  * Getting an active item from a player
  *	-
  * @param client            Player Index
