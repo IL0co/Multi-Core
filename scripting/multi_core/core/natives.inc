@@ -217,13 +217,13 @@ public any Native_MC_GetPluginDisplayName(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
+	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
 
 	char name[128];
-	if(!CallBack_OnPluginUniqueDisplay(client, plugin_id, core_type, name, sizeof(name)))
+	if(!CallBack_OnPluginUniqueDisplay(client, plugin_id, map, core_type, name, sizeof(name)))
 		return false;
 
 	SetNativeString(4, name, GetNativeCell(5));
@@ -241,13 +241,13 @@ public any Native_MC_GetItemDisplayName(Handle plugin, int numParams)
 	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 
 	char item_id[MAX_UNIQUE_LENGTH];
-	GetItemMapNative(3, map, item_id, sizeof(item_id));
+	MC_ItemMap item_map = GetItemMapNative(3, map, item_id, sizeof(item_id));
 
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(4, core_type, sizeof(core_type));
 
 	char name[128];
-	if(!CallBack_OnItemDisplay(client, plugin_id, item_id, core_type, name, sizeof(name)))
+	if(!CallBack_OnItemDisplay(client, plugin_id, map, item_id, item_map, core_type, name, sizeof(name)))
 		return false;
 
 	SetNativeString(5, name, GetNativeCell(6));
@@ -265,12 +265,12 @@ public any Native_MC_CallItemPreview(Handle plugin, int numParams)
 	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 
 	char item_id[MAX_UNIQUE_LENGTH];
-	GetItemMapNative(3, map, item_id, sizeof(item_id));
+	MC_ItemMap item_map = GetItemMapNative(3, map, item_id, sizeof(item_id));
 
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(4, core_type, sizeof(core_type));
 
-	CallBack_OnItemPreview(client, plugin_id, item_id, core_type);
+	CallBack_OnItemPreview(client, plugin_id, map, item_id, item_map, core_type);
 }
 
 public any Native_MC_CallItemSelected(Handle plugin, int numParams)
@@ -289,7 +289,7 @@ public any Native_MC_CallItemSelected(Handle plugin, int numParams)
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(4, core_type, sizeof(core_type));
 
-	return CallBack_OnItemSelected(client, map, item_map, plugin_id, item_id, core_type);
+	return CallBack_OnItemSelected(client, plugin_id, map, item_id, item_map, core_type);
 }
 
 public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
@@ -305,7 +305,7 @@ public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
 
-	return CallBack_OnPluginSelected(client, map, plugin_id, core_type);
+	return CallBack_OnPluginSelected(client, plugin_id, map, core_type);
 }
 
 public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)

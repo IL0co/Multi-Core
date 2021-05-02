@@ -40,12 +40,8 @@ void CallForward_OnPluginUnRegistered(char[] plugin_id)
 	Call_Finish();
 }
 
-bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, char[] core_type, char[] buffer, int maxlen)
+bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, MC_PluginMap map, char[] core_type, char[] buffer, int maxlen)
 {
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
-
     Function func = map.GetCallBack(PLUGIN_DATAPACKPOS_DISPLAY);
     bool result;
 
@@ -66,7 +62,7 @@ bool CallBack_OnPluginUniqueDisplay(int client, const char[] plugin_id, char[] c
     return result;
 }
 
-bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin_id, char[] core_type)
+bool CallBack_OnPluginSelected(int client, const char[] plugin_id, MC_PluginMap map, char[] core_type)
 {
     Function func = map.GetCallBack(PLUGIN_DATAPACKPOS_SELECTED);
     bool result = true;
@@ -83,13 +79,9 @@ bool CallBack_OnPluginSelected(int client, MC_PluginMap map, const char[] plugin
     return result;
 }
 
-bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen)
+bool CallBack_OnItemDisplay(int client, const char[] plugin_id, MC_PluginMap map, const char[] item_unique, MC_ItemMap item_map, char[] core_type, char[] buffer, int maxlen)
 {
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
-
-    Function func = map.GetItemMap(item_unique).GetCallBack(ITEM_DATAPACKPOS_DISPLAY);
+    Function func = item_map.GetCallBack(ITEM_DATAPACKPOS_DISPLAY);
     bool result;
 
     if(Check_IsValidFunctionCallBack(func, map.Plugin))
@@ -110,13 +102,9 @@ bool CallBack_OnItemDisplay(int client, const char[] plugin_id, const char[] ite
     return result;
 }
 
-void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] item_unique, char[] core_type)
+void CallBack_OnItemPreview(int client, const char[] plugin_id, MC_PluginMap map, const char[] item_unique, MC_ItemMap item_map, char[] core_type)
 {
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return;
-
-    Function func = map.GetItemMap(item_unique).GetCallBack(ITEM_DATAPACKPOS_PREVIEW);
+    Function func = item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW);
 
     if(Check_IsValidFunctionCallBack(func, map.Plugin))
     {
@@ -129,7 +117,7 @@ void CallBack_OnItemPreview(int client, const char[] plugin_id, const char[] ite
     }
 }
 
-bool CallBack_OnItemSelected(int client, MC_PluginMap plugin_map, MC_ItemMap item_map, const char[] plugin_id, const char[] item_unique, char[] core_type)
+bool CallBack_OnItemSelected(int client, const char[] plugin_id, MC_PluginMap plugin_map, const char[] item_unique, MC_ItemMap item_map, char[] core_type)
 {
     Function func = item_map.GetCallBack(ITEM_DATAPACKPOS_SELECTED);
     bool result = true;
