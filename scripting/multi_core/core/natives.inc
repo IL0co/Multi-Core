@@ -205,16 +205,7 @@ public any Native_MC_GetPluginIdsArrayList(Handle plugin, int numParams)
 
 public any Native_MC_GetPluginItemsArrayList(Handle plugin, int numParams)
 {
-	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(1, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
-	
+	MC_PluginMap map = GetPluginMapNative(1);
 	return map.GetItemsArray().Clone();
 }
 
@@ -226,14 +217,7 @@ public any Native_MC_GetPluginDisplayName(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
+	GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
@@ -254,15 +238,8 @@ public any Native_MC_GetItemDisplayName(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
-	
+	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
+
 	char item_id[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, item_id, sizeof(item_id));
 
@@ -288,15 +265,8 @@ public any Native_MC_CallItemPreview(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
+	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
+
 	char item_id[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, item_id, sizeof(item_id));
 
@@ -317,15 +287,8 @@ public any Native_MC_CallItemSelected(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return true;
-	
+	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
+
 	char item_id[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, item_id, sizeof(item_id));
 
@@ -348,14 +311,7 @@ public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return true;
+	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
@@ -365,31 +321,14 @@ public any Native_MC_CallPluginSelected(Handle plugin, int numParams)
 
 public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
 {
-	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(1, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
-
+	MC_PluginMap map = GetPluginMapNative(1);
 	return map.IsHavePreviewItem;
 }
 
 public any Native_MC_IsItemHavePreview(Handle plugin, int numParams)
 {
-	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(1, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
-	
-	MC_PluginMap map;
-	if(!GetPluginMap(plugin_id, map))
-		return false;
-	
+	MC_PluginMap map = GetPluginMapNative(1);
+
 	char item_id[MAX_UNIQUE_LENGTH];
 	GetNativeString(2, item_id, sizeof(item_id));
 
@@ -585,4 +524,15 @@ void RemoveFromNowRegisteredMap(Handle plugin)
 
 	if(buff[0])
 		g_mapNowRegisteredPlugins.Remove(buff);
+}
+
+MC_PluginMap GetPluginMapNative(int native_arg, char[] plugin_id = "", int maxlen = MAX_UNIQUE_LENGTH)
+{
+	GetNativeString(native_arg, plugin_id, maxlen);
+	
+	MC_PluginMap map;
+	if(!GetPluginMap(plugin_id, map))
+		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	
+	return map;
 }
