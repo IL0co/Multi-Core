@@ -72,11 +72,6 @@ public void OnPluginStart()
 		g_kvItemsToAll.Rewind();
 	}
 
-	BuildPath(Path_SM, g_hFilePaths[Shop], sizeof(g_hFilePaths[]), "configs/multi-core/settings_shop.cfg");		
-	g_kvItemsToShop = new KeyValues("Shop Config");
-	if(!g_kvItemsToShop.ImportFromFile(g_hFilePaths[Shop]))
-		Error(FILE_NOT_EXIST, _, g_hFilePaths[Shop]);
-	
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 
 	for(int i = 1; i <= MaxClients; i++)		if(IsValidPlayer(i))

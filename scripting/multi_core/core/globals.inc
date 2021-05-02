@@ -13,7 +13,6 @@ ArrayList g_arPlugins;
 MC_PluginMap g_mapPlugins;
 StringMap g_mapNowRegisteredPlugins;
 StringMap g_mapPriorities;	
-KeyValues g_kvItemsToShop;
 KeyValues g_kvItemsToAll;
 
 stock DataPackPos PLUGIN_DATAPACKPOS_DISPLAY	= view_as<DataPackPos>(0);
