@@ -9,7 +9,6 @@ public void LoadNatives()
 
 	CreateNative("MC_PrecacheFile", Native_MC_PrecacheFile);
 	CreateNative("MC_IsCoreLoaded", Native_MC_IsCoreLoaded);
-	CreateNative("MC_GetSettingsConfigKV", Native_MC_GetSettingsConfigKV);
 
 	CreateNative("MC_GetPluginIdsArrayList", Native_MC_GetPluginIdsArrayList);
 	CreateNative("MC_GetPluginItemsArrayList", Native_MC_GetPluginItemsArrayList);
@@ -593,24 +592,6 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 	GetPluginUniqueById(plugin_index, plugin_id, sizeof(plugin_id));
 	
 	SetPlayerSelectedItem(client, plugin_id, g_hCookieKeys[core_type], item_unique);
-}
-
-public any Native_MC_GetSettingsConfigKV(Handle plugin, int numParams)
-{
-	char path[256];
-	KeyValues kv;
-
-	int core_type = GetNativeCell(1);
-
-	kv = new KeyValues(g_hFileHeads[core_type]);
-
-	if(!kv.ImportFromFile(g_hFilePaths[core_type]))
-	{
-		delete kv;
-		Error(FILE_NOT_EXIST, _, path);
-	}
-
-	return kv;
 }
 
 bool IsValidPluginUnique(char[] plugin_id)

@@ -190,15 +190,6 @@ native bool MC_IsItemHavePreview(MC_PluginIndex plugin_index, char[] item_unique
 native MC_PluginIndex MC_GetPluginIndexFromId(const char[] plugin_id);
 
 /*
- * Get core config
- *	-
- * @param type              Core type
- *	-
- * @return KeyValues handle
-*/
-native KeyValues MC_GetSettingsConfigKV(MC_ValueOfCore type);
- 
-/*
  * Register Plugin Id
  *	-
  * @param plugin_id         Plugin Id
@@ -449,7 +440,6 @@ public void __pl_mc_core_SetNTVOptional()
 {
 	MarkNativeAsOptional("MC_PrecacheFile");
 	MarkNativeAsOptional("MC_IsCoreLoaded");
-	MarkNativeAsOptional("MC_GetSettingsConfigKV");
 	MarkNativeAsOptional("MC_RegisterPlugin");
 	MarkNativeAsOptional("MC_SetPluginCallBacks");
 	MarkNativeAsOptional("MC_StartItem");
