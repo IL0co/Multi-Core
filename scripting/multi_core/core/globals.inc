@@ -3,7 +3,6 @@
 bool g_bIsCoreLoaded;
 
 char g_hCookieKeys[][] = {"all", "vip", "shop"};
-char g_hFilePaths[3][256];											// Пути к конфиг файлам
 
 enum MC_PluginMap {};
 enum MC_ItemMap {};
