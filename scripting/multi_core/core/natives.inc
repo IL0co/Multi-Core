@@ -241,10 +241,7 @@ public any Native_MC_GetItemDisplayName(Handle plugin, int numParams)
 	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 
 	char item_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(3, item_id, sizeof(item_id));
-
-	if(!map.IsValidItem(item_id))
-		Error(ERROR_INVALID_ITEM_UNIQUE, _, item_id);
+	GetItemMapNative(3, map, item_id, sizeof(item_id));
 
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(4, core_type, sizeof(core_type));
@@ -268,10 +265,7 @@ public any Native_MC_CallItemPreview(Handle plugin, int numParams)
 	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 
 	char item_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(3, item_id, sizeof(item_id));
-
-	if(!map.IsValidItem(item_id))
-		Error(ERROR_INVALID_ITEM_UNIQUE, _, item_id);
+	GetItemMapNative(3, map, item_id, sizeof(item_id));
 
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(4, core_type, sizeof(core_type));
@@ -290,12 +284,7 @@ public any Native_MC_CallItemSelected(Handle plugin, int numParams)
 	MC_PluginMap map = GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 
 	char item_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(3, item_id, sizeof(item_id));
-
-	if(!map.IsValidItem(item_id))
-		Error(ERROR_INVALID_ITEM_UNIQUE, _, item_id);
-
-	MC_ItemMap item_map = map.GetItemMap(item_id);
+	MC_ItemMap item_map = GetItemMapNative(3, map, item_id, sizeof(item_id));
 
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(4, core_type, sizeof(core_type));
@@ -328,11 +317,7 @@ public any Native_MC_IsPluginHavePreviewItems(Handle plugin, int numParams)
 public any Native_MC_IsItemHavePreview(Handle plugin, int numParams)
 {
 	MC_PluginMap map = GetPluginMapNative(1);
-
-	char item_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, item_id, sizeof(item_id));
-
-	MC_ItemMap item_map = map.GetItemMap(item_id);
+	MC_ItemMap item_map = GetItemMapNative(2, map);
 
 	return (item_map.GetCallBack(ITEM_DATAPACKPOS_PREVIEW) != INVALID_FUNCTION);
 }
@@ -437,13 +422,9 @@ public int Native_MC_GetClientActiveItem(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 	
 	char item_unique[MAX_UNIQUE_LENGTH];
-	
 	if(!GetPlayerActiveItem(client, plugin_id, item_unique, sizeof(item_unique)))
 		return false;
 
@@ -459,10 +440,7 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
@@ -484,10 +462,7 @@ public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
 		Error(INVALID_CLIENT, client);
 
 	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetNativeString(2, plugin_id, sizeof(plugin_id));
-	
-	if(!IsValidPluginUnique(plugin_id))
-		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
+	GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
 	
 	char core_type[MAX_UNIQUE_LENGTH];
 	GetNativeString(3, core_type, sizeof(core_type));
@@ -535,4 +510,14 @@ MC_PluginMap GetPluginMapNative(int native_arg, char[] plugin_id = "", int maxle
 		Error(ERROR_INVALID_PLUGIN_UNIQUE, _, plugin_id);
 	
 	return map;
+}
+
+MC_ItemMap GetItemMapNative(int native_arg, MC_PluginMap plugin_map, char[] item_id = "", int maxlen = MAX_UNIQUE_LENGTH)
+{
+	GetNativeString(native_arg, item_id, maxlen);
+	
+	if(!plugin_map.IsValidItem(item_id))
+		Error(ERROR_INVALID_ITEM_UNIQUE, _, item_id);
+	
+	return plugin_map.GetItemMap(item_id);
 }
