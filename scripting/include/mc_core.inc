@@ -430,22 +430,41 @@ public SharedPlugin __pl_mc_core =
 
 #if !defined REQUIRE_PLUGIN
 public void __pl_mc_core_SetNTVOptional()
-{
-	MarkNativeAsOptional("MC_PrecacheFile");
-	MarkNativeAsOptional("MC_IsCoreLoaded");
-	MarkNativeAsOptional("MC_RegisterPlugin");
-	MarkNativeAsOptional("MC_SetPluginCallBacks");
-	MarkNativeAsOptional("MC_StartItem");
-	MarkNativeAsOptional("MC_SetItemCallBacks");
-	MarkNativeAsOptional("MC_EndItem");
-	MarkNativeAsOptional("MC_EndPlugin");
-	MarkNativeAsOptional("MC_UnRegisterMe");
-	MarkNativeAsOptional("Native_MC_GetPluginIdsArrayList");
-	MarkNativeAsOptional("MC_IsValidPluginIndex");
-	MarkNativeAsOptional("MC_IsValidPluginUnique");
-	MarkNativeAsOptional("MC_GetClientActiveItem");
-	MarkNativeAsOptional("MC_GetClientSelectedItem");
-	MarkNativeAsOptional("MC_SetClientSelectedItem");
-	MarkNativeAsOptional("MC_GetPluginsCountRegisteredByMe");
+{   
+    MarkNativeAsOptional("MC_PrecacheFile");
+    
+    MarkNativeAsOptional("MC_IsCoreLoaded");
+
+    MarkNativeAsOptional("MC_GetPluginIndexFromId");
+
+    MarkNativeAsOptional("MC_RegisterPlugin");
+    MarkNativeAsOptional("MC_SetPluginCallBacks");
+    MarkNativeAsOptional("MC_StartItem");
+    MarkNativeAsOptional("MC_SetItemCallBacks");
+    MarkNativeAsOptional("MC_EndItem");
+    MarkNativeAsOptional("MC_EndPlugin");
+    MarkNativeAsOptional("MC_UnRegisterMe");
+
+    MarkNativeAsOptional("MC_GetPluginIdsArrayList");
+    MarkNativeAsOptional("MC_GetPluginItemsArrayList");
+
+    MarkNativeAsOptional("MC_IsValidPluginIndex");
+    MarkNativeAsOptional("MC_IsValidPluginUnique");
+
+    MarkNativeAsOptional("MC_GetPluginsCountRegisteredByMe");
+
+    MarkNativeAsOptional("MC_GetPluginDisplayName");
+    MarkNativeAsOptional("MC_GetItemDisplayName");
+
+    MarkNativeAsOptional("MC_IsPluginHavePreviewItems");
+    MarkNativeAsOptional("MC_IsItemHavePreview");
+
+    MarkNativeAsOptional("MC_CallPluginSelected");
+    MarkNativeAsOptional("MC_CallItemPreview");
+    MarkNativeAsOptional("MC_CallItemSelected");
+
+    MarkNativeAsOptional("MC_GetClientActiveItem");
+    MarkNativeAsOptional("MC_GetClientSelectedItem");
+    MarkNativeAsOptional("MC_SetClientSelectedItem");
 }
 #endif
