@@ -55,6 +55,8 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 	plugin_map = new MC_PluginMap();
 	plugin_map.SetUnique(plugin_id);
 	plugin_map.Plugin = plugin;
+
+	FormatEx(plugin_id, sizeof(plugin_id), "multicore:%s", plugin_id);
 	plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Public);
 	
 	char buff[32];
