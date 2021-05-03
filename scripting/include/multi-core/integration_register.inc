@@ -21,7 +21,7 @@ typedef MC_OnIntegratorGetActiveClientItem = function bool (int client, const ch
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_CallPluginSelected(int client, char[] plugin_id, char[] core_type);
+native bool MC_CallPluginSelected(int client, const char[] plugin_id, const char[] core_type);
  
 /*
  * Call a preview of the item for the player
@@ -33,7 +33,7 @@ native bool MC_CallPluginSelected(int client, char[] plugin_id, char[] core_type
  *	-
  * @noreturn
 */
-native void MC_CallItemPreview(int client, char[] plugin_id, const char[] item_unique, char[] core_type);
+native void MC_CallItemPreview(int client, const char[] plugin_id, const char[] item_unique, const char[] core_type);
  
 /*
  * Call a select callback of the item for the player
@@ -45,15 +45,15 @@ native void MC_CallItemPreview(int client, char[] plugin_id, const char[] item_u
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_CallItemSelected(int client, char[] plugin_id, const char[] item_unique, char[] core_type);
+native bool MC_CallItemSelected(int client, const char[] plugin_id, const char[] item_unique, const char[] core_type);
  
 /*
  * Call a select callback of the item for the player
  *	-
  * @param id                Integrator identifier (shop, vip, etc.)
- * @param OnGetArray        Callback to get the active item from the player
+ * @param OnGetItem         Callback to get the active item from the player
  *	-
  * @return true if given permission, false otherwise
 */
-native bool MC_RegisterIntegration(char[] id, MC_OnIntegratorGetActiveClientItem OnGetArray = INVALID_FUNCTION);
+native bool MC_RegisterIntegration(const char[] id, MC_OnIntegratorGetActiveClientItem OnGetItem);
  
