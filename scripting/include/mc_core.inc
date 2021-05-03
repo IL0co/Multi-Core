@@ -164,7 +164,7 @@ native bool MC_GetPluginDisplayName(int client, char[] plugin_id, char[] core_ty
 native bool MC_GetItemDisplayName(int client, char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
  
 /*
- * Getting an active item from a player
+ * Getting an active item from a player (including filters)
  *	-
  * @param client            Player Index
  * @param plugin_id         Plugin Id
