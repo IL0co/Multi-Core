@@ -100,7 +100,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_mc_dump", Command_Dump, ADMFLAG_ROOT);
 	LoadTranslations("mc_core.phrases");
 
-	g_bIsCoreLoaded = true;
+	CreateTimer(1.0, Timer_Delay_StartCore);
 }
 
 public Action Command_Dump(int client, int args)
