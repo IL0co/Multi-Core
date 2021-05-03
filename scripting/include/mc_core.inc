@@ -79,7 +79,7 @@ native bool MC_IsCoreLoaded();
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_IsPluginHavePreviewItems(char[] plugin_id);
+native bool MC_IsPluginHavePreviewItems(const char[] plugin_id);
 
 /*
  * Check if the item has a preview
@@ -89,7 +89,7 @@ native bool MC_IsPluginHavePreviewItems(char[] plugin_id);
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_IsItemHavePreview(char[] plugin_id, char[] item_unique);
+native bool MC_IsItemHavePreview(const char[] plugin_id, const char[] item_unique);
 
 /*
  * Unload plugin data (completely). Must be called in OnPluginEnd()
@@ -116,7 +116,7 @@ native ArrayList MC_GetPluginIdsArrayList();
  *	-
  * @return ArrayList Handle      
 */
-native ArrayList MC_GetPluginItemsArrayList(char[] plugin_id);
+native ArrayList MC_GetPluginItemsArrayList(const char[] plugin_id);
 
 /*
  * Check the validity of the plugin by its identifier
@@ -147,7 +147,7 @@ native int MC_GetPluginsCountRegisteredByMe();
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetPluginDisplayName(int client, char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
+native bool MC_GetPluginDisplayName(int client, const char[] plugin_id, const char[] core_type, const char[] buffer, int maxlen);
  
 /*
  * Get the display name of the item
@@ -161,7 +161,7 @@ native bool MC_GetPluginDisplayName(int client, char[] plugin_id, char[] core_ty
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetItemDisplayName(int client, char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
+native bool MC_GetItemDisplayName(int client, const char[] plugin_id, const char[] item_unique, const char[] core_type, const char[] buffer, int maxlen);
  
 /*
  * Getting an active item from a player (including filters)
@@ -173,7 +173,7 @@ native bool MC_GetItemDisplayName(int client, char[] plugin_id, const char[] ite
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientActiveItem(int client, char[] plugin_id, char[] buffer, int maxlen);
+native bool MC_GetClientActiveItem(int client, const char[] plugin_id, const char[] buffer, int maxlen);
  
 /*
  * Getting an selected item from the player
@@ -186,7 +186,7 @@ native bool MC_GetClientActiveItem(int client, char[] plugin_id, char[] buffer, 
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_GetClientSelectedItem(int client, char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
+native bool MC_GetClientSelectedItem(int client, const char[] plugin_id, const char[] core_type, const char[] buffer, int maxlen);
  
 /*
  * Get module config from folder 'addons/sourcemod/configs/multi-core/modules/'

@@ -12,7 +12,7 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, const char[] core_type, char[] buffer, int maxlen);
 
     /*
      * Callback to display item name in menu
@@ -26,7 +26,7 @@ typeset MC_OnMenuDisplayCallbacks
      *  -
      * @return true - to display the new name or not change it, false - to hide
     */
-	function bool (int client, const char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
+	function bool (int client, const char[] plugin_id, const char[] item_unique, const char[] core_type, char[] buffer, int maxlen);
 }
 
 typeset MC_OnMenuSelectedCallbacks
@@ -42,7 +42,7 @@ typeset MC_OnMenuSelectedCallbacks
      *  -
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_id, char[] core_type);
+	function bool (int client, const char[] plugin_id, const char[] core_type);
 
     /*
      * Callback when selecting a item from the menu
@@ -56,7 +56,7 @@ typeset MC_OnMenuSelectedCallbacks
      *	-
      * @return true - continue the action, false - stop the action
     */
-	function bool (int client, const char[] plugin_id, const char[] item_unique, char[] core_type);
+	function bool (int client, const char[] plugin_id, const char[] item_unique, const char[] core_type);
 }
 
 /*
@@ -69,7 +69,7 @@ typeset MC_OnMenuSelectedCallbacks
  *	-
  * @noreturn
 */
-typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, const char[] item_unique, char[] core_type);
+typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugin_id, const char[] item_unique, const char[] core_type);
 
 /*
  * Register Plugin Id
@@ -78,7 +78,7 @@ typedef MC_OnItemPreviewCallback = function void (int client, const char[] plugi
  *	-
  * @noreturn   
 */
-native void MC_RegisterPlugin(char[] plugin_id);
+native void MC_RegisterPlugin(const char[]plugin_id);
  
 /*
  * Add plugin callbacks
@@ -98,7 +98,7 @@ native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallbacks OnDisplay = INVALID_
  *	-
  * @return true if all is well, false otherwise 
 */
-native bool MC_StartItem(char[] item_unique);
+native bool MC_StartItem(const char[]item_unique);
 
 /*
  * Add item callbacks
