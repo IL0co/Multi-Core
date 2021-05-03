@@ -103,21 +103,28 @@
 	"ERROR INVALID PLUGIN UNIQUE"
 	{
 		"#format"   	"{1:s}"
-		"ru"		"Невалидный Plugin_Unique '%s'"
-		"en"		"Invalid Plugin_Unique '%s'"
+		"ru"		"Невалидный Plugin_Unique '{1}'"
+		"en"		"Invalid Plugin_Unique '{1}'"
 	}
 	
 	"ERROR INVALID ITEM UNIQUE"
 	{
 		"#format"   	"{1:s}"
-		"ru"		"Невалидный Item_Unique '%s'"
-		"en"		"Invalid Item_Unique '%s'"
+		"ru"		"Невалидный Item_Unique '{1}'"
+		"en"		"Invalid Item_Unique '{1}'"
 	}
 	
 	"ERROR FILE DOES NOT EXISTS"
 	{
 		"#format"   	"{1:s}"
-		"ru"		"Файла не существует! '{%s}'"
-		"en"		"File does not exist! '{%s}'"
+		"ru"		"Файла не существует! '{1}'"
+		"en"		"File does not exist! '{1}'"
+	}
+	
+	"INTEGRATION IS ALREADY REGISTERED"
+	{
+		"#format"   	"{1:s}"
+		"ru"		"Модуль интеграции уже зарегистрирован! '{1}'"
+		"en"		"The integration module is already registered! '{1}'"
 	}
 }	

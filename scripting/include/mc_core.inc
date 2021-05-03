@@ -263,6 +263,7 @@ public void __pl_mc_core_SetNTVOptional()
     MarkNativeAsOptional("MC_CallPluginSelected");
     MarkNativeAsOptional("MC_CallItemPreview");
     MarkNativeAsOptional("MC_CallItemSelected");
+    MarkNativeAsOptional("MC_RegisterIntegration");
 
     MarkNativeAsOptional("MC_GetClientActiveItem");
     MarkNativeAsOptional("MC_GetClientSelectedItem");
