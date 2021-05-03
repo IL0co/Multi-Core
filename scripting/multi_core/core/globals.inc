@@ -2,8 +2,6 @@
 
 bool g_bIsCoreLoaded;
 
-char g_hCookieKeys[][] = {"all", "vip", "shop"};
-
 enum MC_PluginMap {};
 enum MC_ItemMap {};
 enum MC_Error {};
@@ -13,6 +11,8 @@ MC_PluginMap g_mapPlugins;
 StringMap g_mapNowRegisteredPlugins;
 StringMap g_mapPriorities;	
 KeyValues g_kvItemsToAll;
+StringMap g_mapIntegrations;
+ArrayList g_arIntegrations;
 
 stock DataPackPos PLUGIN_DATAPACKPOS_DISPLAY	= view_as<DataPackPos>(0);
 stock DataPackPos PLUGIN_DATAPACKPOS_SELECTED	= view_as<DataPackPos>(1);
@@ -21,7 +21,8 @@ stock DataPackPos ITEM_DATAPACKPOS_DISPLAY		= view_as<DataPackPos>(0);
 stock DataPackPos ITEM_DATAPACKPOS_PREVIEW		= view_as<DataPackPos>(1);
 stock DataPackPos ITEM_DATAPACKPOS_SELECTED		= view_as<DataPackPos>(2);
 
-KeyValues g_kvActiveClientList[MAXPLAYERS+1];	
+stock DataPackPos INTEGRATION_DATAPACKPOS_PLUGIN		= view_as<DataPackPos>(0);
+stock DataPackPos INTEGRATION_DATAPACKPOS_GET_ARRAY		= view_as<DataPackPos>(1);
 
 methodmap MC_ItemMap < StringMap
 {
@@ -259,20 +260,20 @@ methodmap MC_PluginMap < StringMap
 			this.SetValue("Plugin", plugin, true);
 		}
 	}
-	property Cookie Cookie
-	{
-		public get()
-		{
-			Cookie cookie;
-			this.GetValue("Cookie", cookie);
+	// property Cookie Cookie
+	// {
+	// 	public get()
+	// 	{
+	// 		Cookie cookie;
+	// 		this.GetValue("Cookie", cookie);
 
-			return cookie;
-		}
-		public set(Cookie cookie)
-		{
-			this.SetValue("Cookie", cookie, true);
-		}
-	}
+	// 		return cookie;
+	// 	}
+	// 	public set(Cookie cookie)
+	// 	{
+	// 		this.SetValue("Cookie", cookie, true);
+	// 	}
+	// }
 
 	property Handle DeathTimer
 	{
@@ -291,7 +292,7 @@ methodmap MC_PluginMap < StringMap
 
 	public void UnregisterMe()
 	{
-		delete this.Cookie;
+		// delete this.Cookie;
 		delete this.GetCallBacksPack();
 		this.UnregisterItems();
 		delete this.GetItemsMap();

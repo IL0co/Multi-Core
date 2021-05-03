@@ -135,6 +135,32 @@ bool CallBack_OnItemSelected(int client, const char[] plugin_id, MC_PluginMap pl
     return result;
 }
 
+bool CallBack_OnGetIntegrationClientItem(int client, const char[] plugin_id, const char[] core_type, char[] buffer, int maxlen)
+{
+    DataPack data;
+    g_mapIntegrations.GetValue(core_type, data);
+
+    data.Position = INTEGRATION_DATAPACKPOS_PLUGIN;
+    Handle plugin = data.ReadCell();
+
+    data.Position = INTEGRATION_DATAPACKPOS_GET_ARRAY;
+    Function func = data.ReadFunction();
+
+    bool result = false;
+
+    if(Check_IsValidFunctionCallBack(func, plugin))
+    {
+        Call_StartFunction(plugin, func);
+        Call_PushCell(client);
+        Call_PushString(plugin_id);
+        Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+        Call_PushCell(maxlen);
+        Call_Finish(result);
+    }
+
+    return result;
+}
+
 bool Check_IsValidFunctionCallBack(Function func, Handle plugin)
 {
     if(!Check_IsValidFunction(func) || !Check_IsValidPlugin(plugin))

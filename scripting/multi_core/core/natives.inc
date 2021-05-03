@@ -6,6 +6,8 @@ public void LoadNatives()
 	g_mapNowRegisteredPlugins = new StringMap();
 	g_mapPriorities = new StringMap();
 	g_mapPlugins = view_as<MC_PluginMap>(new StringMap());
+	g_mapIntegrations = new StringMap();
+	g_arIntegrations = new ArrayList(MAX_UNIQUE_LENGTH);
 
 	CreateNative("MC_PrecacheFile", Native_MC_PrecacheFile);
 	CreateNative("MC_IsCoreLoaded", Native_MC_IsCoreLoaded);
@@ -26,6 +28,8 @@ public void LoadNatives()
 	CreateNative("MC_IsValidPluginUnique", Native_MC_IsValidPluginUnique);
 	CreateNative("MC_GetPluginsCountRegisteredByMe", Native_MC_GetPluginsCountRegisteredByMe);
 
+	CreateNative("MC_RegisterIntegration", Native_MC_RegisterIntegration);
+
 	CreateNative("MC_RegisterPlugin", Native_MC_RegisterPlugin);
 	CreateNative("MC_SetPluginCallBacks", Native_MC_SetPluginCallBacks);
 	CreateNative("MC_StartItem", Native_MC_StartItem);
@@ -36,7 +40,22 @@ public void LoadNatives()
 
 	CreateNative("MC_GetClientActiveItem", Native_MC_GetClientActiveItem);
 	CreateNative("MC_GetClientSelectedItem", Native_MC_GetClientSelectedItem);
-	CreateNative("MC_SetClientSelectedItem", Native_MC_SetClientSelectedItem);
+}
+
+public any Native_MC_RegisterIntegration(Handle plugin, int numParams)
+{
+	char id[MAX_UNIQUE_LENGTH];
+	GetNativeString(1, id, sizeof(id));
+
+	if(g_arIntegrations.FindString(id) != -1)
+		Error(INTEGRATION_IS_ALREADY_REGISTERED, _, id);
+
+	DataPack data = new DataPack();
+	data.WriteCell(plugin);
+	data.WriteFunction(GetNativeFunction(2));
+
+	g_mapIntegrations.SetValue(id, data);
+	g_arIntegrations.PushString(id);
 }
 
 public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
@@ -56,8 +75,8 @@ public int Native_MC_RegisterPlugin(Handle plugin, int numParams)
 	plugin_map.SetUnique(plugin_id);
 	plugin_map.Plugin = plugin;
 
-	FormatEx(plugin_id, sizeof(plugin_id), "multicore:%s", plugin_id);
-	plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Public);
+	// FormatEx(plugin_id, sizeof(plugin_id), "multicore:%s", plugin_id);
+	// plugin_map.Cookie = new Cookie(plugin_id, plugin_id, CookieAccess_Public);
 	
 	char buff[32];
 	FormatEx(buff, sizeof(buff), "%i", plugin);
@@ -171,6 +190,7 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 {
 	char plugin_id[MAX_UNIQUE_LENGTH];
 	MC_PluginMap map;
+	DataPack data;
 
 	for(int id; id < g_arPlugins.Length; id++)
 	{
@@ -191,6 +211,22 @@ public int Native_MC_UnRegisterMe(Handle plugin, int numParams)
 		g_arPlugins.SetString(id, "");
 
 		CallForward_OnPluginUnRegistered(plugin_id);
+	}
+
+	for(int id; id < g_arIntegrations.Length; id++)
+	{
+		g_arIntegrations.GetString(id, plugin_id, sizeof(plugin_id));
+		g_mapIntegrations.GetValue(plugin_id, data);
+
+		data.Position = INTEGRATION_DATAPACKPOS_PLUGIN;
+		if(data.ReadCell() != plugin)
+			continue;
+
+		delete data;
+		g_mapIntegrations.Remove(plugin_id);
+		g_arIntegrations.Erase(id);
+
+		id -= 1;
 	}
 }
 
@@ -456,24 +492,6 @@ public int Native_MC_GetClientSelectedItem(Handle plugin, int numParams)
 	return true;
 }
 
-public int Native_MC_SetClientSelectedItem(Handle plugin, int numParams)
-{
-	int client = GetNativeCell(1);
-
-	if(!IsValidPlayer(client))
-		Error(INVALID_CLIENT, client);
-
-	char plugin_id[MAX_UNIQUE_LENGTH];
-	GetPluginMapNative(2, plugin_id, sizeof(plugin_id));
-	
-	char core_type[MAX_UNIQUE_LENGTH];
-	GetNativeString(3, core_type, sizeof(core_type));
-
-	char item_unique[MAX_UNIQUE_LENGTH];
-	GetNativeString(4, item_unique, sizeof(item_unique));
-	
-	SetPlayerSelectedItem(client, plugin_id, core_type, item_unique);
-}
 
 bool IsValidPluginUnique(char[] plugin_id)
 {

@@ -189,18 +189,6 @@ native bool MC_GetClientActiveItem(int client, char[] plugin_id, char[] buffer, 
 native bool MC_GetClientSelectedItem(int client, char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
  
 /*
- * Set the selected item to the player
- *	-
- * @param client            Player Index
- * @param plugin_id         Plugin Id
- * @param core_type         Core type
- * @param item_unique       Item unique name (becomes active)
- *	-
- * @noreturn
-*/
-native void MC_SetClientSelectedItem(int client, char[] plugin_id, char[] core_type, char[] item_unique);
- 
-/*
  * Get module config from folder 'addons/sourcemod/configs/multi-core/modules/'
  *	-
  * @param file_name         File name
@@ -267,6 +255,5 @@ public void __pl_mc_core_SetNTVOptional()
 
     MarkNativeAsOptional("MC_GetClientActiveItem");
     MarkNativeAsOptional("MC_GetClientSelectedItem");
-    MarkNativeAsOptional("MC_SetClientSelectedItem");
 }
 #endif

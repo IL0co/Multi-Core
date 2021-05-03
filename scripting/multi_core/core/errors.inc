@@ -13,6 +13,7 @@ enum Errors
 	ERROR_INVALID_PLUGIN_UNIQUE,
 	ERROR_INVALID_ITEM_UNIQUE,
 	FILE_NOT_EXIST,
+	INTEGRATION_IS_ALREADY_REGISTERED,
 }
 
 void Error(Errors error, any data = -1, char[] unique = "")
@@ -68,5 +69,9 @@ void Error(Errors error, any data = -1, char[] unique = "")
 	else if(error == FILE_NOT_EXIST)
 	{
 		ThrowNativeError(4, "%T", "ERROR FILE DOES NOT EXISTS", 0, unique);
+	}
+	else if(error == INTEGRATION_IS_ALREADY_REGISTERED)
+	{
+		ThrowNativeError(4, "%T", "INTEGRATION IS ALREADY REGISTERED", 0, unique);
 	}
 }

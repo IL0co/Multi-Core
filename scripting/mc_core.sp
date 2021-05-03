@@ -2,7 +2,6 @@
 #include <sdkhooks>
 #include <sourcemod>
 #include <mc_core>
-#include <clientprefs>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -60,11 +59,6 @@ public void OnPluginStart()
 
 		g_kvItemsToAll.Rewind();
 	}
-
-	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
-
-	for(int i = 1; i <= MaxClients; i++)		if(IsValidPlayer(i))
-		OnClientPostAdminCheck(i);
 
 	BuildPath(Path_SM, buff, sizeof(buff), "configs/multi-core/settings_priorities.cfg");
 	KeyValues kv = new KeyValues("MC Priorities");
@@ -132,7 +126,7 @@ public Action Command_Dump(int client, int args)
 		kv.SetNum("Items Array", view_as<int>(ar));
 		kv.SetNum("Items Map", view_as<int>(mc_plugin.GetItemsMap()));
 		kv.SetNum("CallBacks", view_as<int>(mc_plugin.GetCallBacksPack()));
-		kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
+		// kv.SetNum("Cookie", view_as<int>(mc_plugin.Cookie));
 
 		for(int num; num < ar.Length; num++)
 		{
