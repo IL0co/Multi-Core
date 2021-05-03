@@ -15,6 +15,7 @@ enum MC_DataType        // Data types
 }
 
 #include <multi-core/item_register.inc>
+#include <multi-core/integration_register.inc>
 
 /*
  * Precash file
@@ -91,66 +92,6 @@ native bool MC_IsPluginHavePreviewItems(char[] plugin_id);
 native bool MC_IsItemHavePreview(char[] plugin_id, char[] item_unique);
 
 /*
- * Register Plugin Id
- *	-
- * @param plugin_id         Plugin Id
- *	-
- * @noreturn   
-*/
-native void MC_RegisterPlugin(char[] plugin_id);
- 
-/*
- * Add plugin callbacks
- *	-
- * @param OnDisplay         Menu display callback
- * @param OnSelect          Menu Select Callback
- *	-
- * @noreturn 
-*/
-native void MC_SetPluginCallBacks(MC_OnMenuDisplayCallbacks OnDisplay = INVALID_FUNCTION,
-                                  MC_OnMenuSelectedCallbacks OnSelect = INVALID_FUNCTION);
-
-/*
- * Start item registration
- *	-
- * @param item_unique       Item Id (unique)
- *	-
- * @return true if all is well, false otherwise 
-*/
-native bool MC_StartItem(char[] item_unique);
-
-/*
- * Add item callbacks
- *	-
- * @param OnDisplay         Menu display callback
- * @param OnPreview         Item preview callback
- * @param OnSelect          Menu Select Callback
- *	-
- * @noreturn 
-*/
-native void MC_SetItemCallBacks(MC_OnMenuDisplayCallbacks OnDisplay = INVALID_FUNCTION,
-                                MC_OnItemPreviewCallback OnPreview = INVALID_FUNCTION,
-                                MC_OnMenuSelectedCallbacks OnSelect = INVALID_FUNCTION);
-
-/*
- * Finish item registration
- *	-
- * @noparams
- *	-
- * @noreturn   
-*/
-native void MC_EndItem();
- 
-/*
- * Finish plugin registration
- *	-
- * @noparams
- *	-
- * @noreturn 
-*/
-native void MC_EndPlugin();
- 
-/*
  * Unload plugin data (completely). Must be called in OnPluginEnd()
  *	-
  * @noparams
@@ -209,18 +150,6 @@ native int MC_GetPluginsCountRegisteredByMe();
 native bool MC_GetPluginDisplayName(int client, char[] plugin_id, char[] core_type, char[] buffer, int maxlen);
  
 /*
- * Call a select callback of the plugin for the player
- *	-
- * @param client            Player Index
- * @param plugin_id         Plugin Id
- * @param item_unique       Item unique name 
- * @param core_type         Core type
- *	-
- * @return true if given permission, false otherwise
-*/
-native bool MC_CallPluginSelected(int client, char[] plugin_id, char[] core_type);
- 
-/*
  * Get the display name of the item
  *	-
  * @param client            Player Index
@@ -233,30 +162,6 @@ native bool MC_CallPluginSelected(int client, char[] plugin_id, char[] core_type
  * @return true if all is well, false otherwise 
 */
 native bool MC_GetItemDisplayName(int client, char[] plugin_id, const char[] item_unique, char[] core_type, char[] buffer, int maxlen);
- 
-/*
- * Call a preview of the item for the player
- *	-
- * @param client            Player Index
- * @param plugin_id         Plugin Id
- * @param item_unique       Item unique name 
- * @param core_type         Core type
- *	-
- * @noreturn
-*/
-native void MC_CallItemPreview(int client, char[] plugin_id, const char[] item_unique, char[] core_type);
- 
-/*
- * Call a select callback of the item for the player
- *	-
- * @param client            Player Index
- * @param plugin_id         Plugin Id
- * @param item_unique       Item unique name 
- * @param core_type         Core type
- *	-
- * @return true if given permission, false otherwise
-*/
-native bool MC_CallItemSelected(int client, char[] plugin_id, const char[] item_unique, char[] core_type);
  
 /*
  * Getting an active item from a player
